@@ -23,3 +23,11 @@ updates:
     groups:
       docs-tooling:
         patterns: ["*"]
+
+  - package-ecosystem: docker-compose
+    directory: /dev/structurizr
+    schedule:
+      interval: weekly
+    commit-message:
+      prefix: docs
+      include: scope

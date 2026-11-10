@@ -12,6 +12,8 @@ AulaDesk es un cliente de escritorio para Moodle, para Windows y Linux. Se conec
 |---|---|
 | [Registro de decisiones](registro-de-decisiones.md) | Contexto, alcance y estado actual de todas las decisiones del proyecto |
 | [ADR](adr/index.md) | Registros de las decisiones de arquitectura más importantes, con sus alternativas |
+| [Arquitectura (C4)](https://sebastian-alvarez.github.io/AulaDesk/arquitectura/) | Diagramas de contexto y de contenedores, generados desde Structurizr DSL |
+| [Login](diagramas/login.md) | Diagrama de secuencia del login |
 | [Validación de la fase 1](validacion/fase-1.md) | Resultados de la validación de la API contra el aula virtual de la USM |
 
 ## Aviso

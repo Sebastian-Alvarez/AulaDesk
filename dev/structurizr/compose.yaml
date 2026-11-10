@@ -1,0 +1,17 @@
+# Structurizr para los diagramas C4 (D-26). Se usa desde el justfile:
+# diagrams-serve, diagrams-check y docs-diagrams.
+services:
+  structurizr:
+    image: structurizr/structurizr:2026.10.26
+    # En Linux, el justfile define STRUCTURIZR_USER con el uid y gid de quien lo
+    # ejecuta, para que el contenedor pueda escribir en arquitectura/ y site/.
+    # En Windows no hace falta y se usa el usuario de la imagen.
+    user: "${STRUCTURIZR_USER:-65532:65532}"
+    ports:
+      - "8080:8080"
+    volumes:
+      # Carpeta del modelo: local lee workspace.dsl y guarda workspace.json aquí
+      - "../../arquitectura:/usr/local/structurizr"
+      # Raíz del repositorio: el export escribe en site/arquitectura/
+      - "../..:/repo"
+    command: local

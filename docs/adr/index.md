@@ -5,6 +5,7 @@ Cada decisión importante tiene su propio ADR en esta carpeta, en formato [MADR]
 | ADR | Título | Decisiones | Estado | Fecha |
 |---|---|---|---|---|
 | [0001](0001-entorno-de-desarrollo.md) | Entorno de desarrollo | D-27 a D-32 | Aceptado | 2026-11-08 |
+| [0002](0002-diagramas-c4-como-codigo.md) | Diagramas C4 como código | D-26 | Aceptado | 2026-11-09 |
 
 ## Mantenimiento
 
