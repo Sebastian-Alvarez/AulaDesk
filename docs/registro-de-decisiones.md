@@ -2,7 +2,7 @@
 title: AulaDesk - Registro de decisiones
 project: AulaDesk (nombre temporal)
 stage: Análisis y diseño inicial
-updated: 2026-11-08
+updated: 2026-11-09
 ---
 
 # AulaDesk - Registro de decisiones
@@ -12,7 +12,7 @@ AulaDesk es un nombre temporal. El nombre definitivo no puede incluir "Moodle", 
 | Campo | Valor |
 |---|---|
 | Etapa | Análisis y diseño inicial |
-| Última actualización | 2026-11-08 |
+| Última actualización | 2026-11-09 |
 | Estados usados | Decidido, Pospuesto, Pendiente, Propuesto |
 
 ## Contenido
@@ -128,7 +128,7 @@ Alcance confirmado por la [validación de la fase 1](validacion/fase-1.md):
 | D-20 | Licencia | Apache 2.0 | Decidido |
 | D-21 | Visibilidad del repositorio | Privado en la fase 1; público con la CLI funcionando | Decidido |
 | D-22 | Nombre | AulaDesk como nombre temporal | Decidido |
-| D-23 | Documentación | Carpeta `docs/`, publicada con GitHub Pages al abrir el repositorio | Decidido |
+| D-23 | Documentación | Carpeta `docs/`, publicada con GitHub Pages desde la fase 1 | Decidido |
 | D-24 | Registro de decisiones | ADR en formato MADR mínimo; este documento como índice | Decidido |
 | D-25 | Sitio de documentación | Zensical (mdBook como alternativa) | Decidido |
 | D-26 | Diagramas | C4 en Lucidchart; diagramas de secuencia en Mermaid | Decidido |
@@ -267,7 +267,7 @@ La exportación iCal está activa en la USM.
 
 **D-22 Nombre.** AulaDesk como nombre temporal (`auladesk-core`, `auladesk-cli`, `auladesk-desktop`).
 
-**D-23 Documentación.** Se escribe en `docs/` dentro del repositorio y se publica con GitHub Pages cuando el repositorio sea público. Un sitio de GitHub Pages es público aunque el repositorio sea privado.
+**D-23 Documentación.** Se escribe en `docs/` dentro del repositorio y se publica con GitHub Pages desde la fase 1, aunque el repositorio sea privado. El sitio es público y solo contiene documentación, sin código ni secretos. La publicación se controla con la variable `PAGES_ENABLED` del workflow Docs.
 
 **D-24 Registro de decisiones.** Un ADR por decisión importante, en formato MADR (variante mínima), en `docs/adr/`. Este documento funciona como índice.
 
