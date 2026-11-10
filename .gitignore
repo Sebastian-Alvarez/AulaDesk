@@ -1,0 +1,111 @@
+# ---------------------------------------------------------------
+# Rust
+# ---------------------------------------------------------------
+target/
+**/*.rs.bk
+*.pdb
+rustc-ice-*.txt
+
+# ---------------------------------------------------------------
+# Frontend y Tauri (fase 2)
+# ---------------------------------------------------------------
+node_modules/
+dist/
+dist-ssr/
+*.tsbuildinfo
+.vite/
+vite.config.*.timestamp-*
+.eslintcache
+.pnpm-store/
+**/src-tauri/gen/schemas/
+
+# ---------------------------------------------------------------
+# Logs y cobertura
+# ---------------------------------------------------------------
+*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+coverage/
+*.lcov
+
+# ---------------------------------------------------------------
+# Documentación (salida de Zensical)
+# ---------------------------------------------------------------
+/site/
+.cache/
+
+# ---------------------------------------------------------------
+# Python (herramientas auxiliares)
+# ---------------------------------------------------------------
+__pycache__/
+*.py[cod]
+.venv/
+venv/
+
+# ---------------------------------------------------------------
+# Secretos y datos locales: nunca al repositorio
+# ---------------------------------------------------------------
+.env
+.env.*
+!.env.example
+*.pem
+*.key
+*.p12
+*.pfx
+credentials*
+secrets*
+config.local.*
+
+# Bases de datos locales
+*.db
+*.db-journal
+*.db-shm
+*.db-wal
+*.sqlite
+*.sqlite3
+
+# Respuestas guardadas de la API, informes de validación y descargas
+responses/
+validation/
+downloads/
+*.har
+
+# ---------------------------------------------------------------
+# JetBrains (RustRover): solo los archivos personales.
+# Basado en github/gitignore Global/JetBrains.gitignore.
+# ---------------------------------------------------------------
+.idea/**/workspace.xml
+.idea/**/tasks.xml
+.idea/**/usage.statistics.xml
+.idea/**/dictionaries
+.idea/**/shelf
+.idea/**/contentModel.xml
+.idea/**/dataSources/
+.idea/**/dataSources.ids
+.idea/**/dataSources.local.xml
+.idea/**/sqlDataSources.xml
+.idea/**/dynamic.xml
+.idea/**/copilot.data.migration.*.xml
+.idea/caches/
+.idea/sonarlint/
+.idea/sonarlint.xml
+.idea/replstate.xml
+*.iws
+# HTTP Client: peticiones guardadas y variables privadas (lineamiento 7.1)
+.idea/httpRequests/
+http-client.private.env.json
+# Rutas locales a la base SQLite: distintas en cada máquina
+.idea/**/dataSources.xml
+.idea/**/sqldialects.xml
+
+# ---------------------------------------------------------------
+# Sistema operativo y editores
+# ---------------------------------------------------------------
+.DS_Store
+Thumbs.db
+desktop.ini
+.vscode/
+*.swp
+*~
