@@ -10,7 +10,20 @@ En muchas instancias de Moodle hay que iniciar sesión todos los días desde el 
 
 ## Estado
 
-Etapa de análisis y diseño inicial. La documentación del proyecto está en [`docs/`](docs/).
+Etapa de análisis y diseño inicial. La documentación del proyecto está en [`docs/`](docs/):
+
+- [Registro de decisiones](docs/registro-de-decisiones.md)
+- [ADR](docs/adr/index.md)
+- [Validación de la fase 1](docs/validacion/fase-1.md)
+
+## Documentación local
+
+La documentación se publica con [Zensical](https://zensical.org/). Para verla en local se necesitan [`just`](https://just.systems/) y [`uv`](https://docs.astral.sh/uv/):
+
+```sh
+just docs-serve   # vista previa en http://localhost:8000
+just docs-build   # construye el sitio en site/
+```
 
 ## Licencia
 

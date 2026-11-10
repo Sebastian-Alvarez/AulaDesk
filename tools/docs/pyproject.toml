@@ -1,0 +1,13 @@
+# Dependencias para construir el sitio de documentación.
+# No es un paquete: uv solo lo usa para fijar versiones (uv.lock).
+[project]
+name = "auladesk-docs"
+version = "0.0.0"
+description = "Herramientas de documentación de AulaDesk"
+requires-python = "==3.13.*"
+dependencies = [
+    "zensical==0.1.0",
+]
+
+[tool.uv]
+package = false
