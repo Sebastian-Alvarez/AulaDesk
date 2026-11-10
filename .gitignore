@@ -35,6 +35,9 @@ coverage/
 # ---------------------------------------------------------------
 /site/
 .cache/
+# Structurizr local: índice de búsqueda, logs y layout regenerado (todas las vistas usan autoLayout)
+arquitectura/.structurizr/
+arquitectura/workspace.json
 
 # ---------------------------------------------------------------
 # Python (herramientas auxiliares)

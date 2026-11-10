@@ -2,7 +2,7 @@
 title: AulaDesk - Registro de decisiones
 project: AulaDesk (nombre temporal)
 stage: Análisis y diseño inicial
-updated: 2026-11-09
+updated: 2026-11-10
 ---
 
 # AulaDesk - Registro de decisiones
@@ -12,7 +12,7 @@ AulaDesk es un nombre temporal. El nombre definitivo no puede incluir "Moodle", 
 | Campo | Valor |
 |---|---|
 | Etapa | Análisis y diseño inicial |
-| Última actualización | 2026-11-09 |
+| Última actualización | 2026-11-10 |
 | Estados usados | Decidido, Pospuesto, Pendiente, Propuesto |
 
 ## Contenido
@@ -131,7 +131,7 @@ Alcance confirmado por la [validación de la fase 1](validacion/fase-1.md):
 | D-23 | Documentación | Carpeta `docs/`, publicada con GitHub Pages desde la fase 1 | Decidido |
 | D-24 | Registro de decisiones | ADR en formato MADR mínimo; este documento como índice | Decidido |
 | D-25 | Sitio de documentación | Zensical (mdBook como alternativa) | Decidido |
-| D-26 | Diagramas | C4 en Lucidchart; diagramas de secuencia en Mermaid | Decidido |
+| D-26 | Diagramas | C4 en Structurizr DSL; diagramas de secuencia en Mermaid | Decidido |
 | D-27 | Entorno de desarrollo | Windows con RustRover; Linux en dual boot para validar | Decidido |
 | D-28 | Herramientas de calidad | rustfmt, clippy, cargo-deny, cargo-nextest, cargo-llvm-cov, cargo-machete, mockito e insta | Decidido |
 | D-29 | Hooks y tareas | prek con `.pre-commit-config.yaml`; tareas con `just` | Decidido |
@@ -273,7 +273,7 @@ La exportación iCal está activa en la USM.
 
 **D-25 Sitio de documentación.** Zensical, sucesor de Material for MkDocs. mdBook queda como alternativa según el formato y el diseño; no se cambia por ahora.
 
-**D-26 Diagramas.** Diagramas C4 en Lucidchart, en el documento "AulaDesk - C4 Diagrams" (niveles 1 y 2). Diagramas de secuencia en Mermaid.
+**D-26 Diagramas.** Diagramas C4 en Structurizr DSL (`arquitectura/workspace.dsl`), publicados como sitio estático en `/arquitectura/`. Diagramas de secuencia en Mermaid, en `docs/diagramas/`. El detalle, con las alternativas consideradas, está en el ADR [Diagramas C4 como código](adr/0002-diagramas-c4-como-codigo.md).
 
 ### 5.9 Entorno de desarrollo
 
@@ -442,8 +442,8 @@ Realizada el 2026-11-07. El detalle está en el [informe de validación](validac
 
 | Artefacto | Ubicación |
 |---|---|
-| Diagramas C4 (niveles 1 y 2) | Lucidchart: "AulaDesk - C4 Diagrams" |
-| Diagrama de secuencia del login | Mermaid |
+| Diagramas C4 (niveles 1 y 2) | `arquitectura/workspace.dsl`, publicado en [Arquitectura (C4)](https://sebastian-alvarez.github.io/AulaDesk/arquitectura/) |
+| Diagrama de secuencia del login | [Login](diagramas/login.md) |
 | MoodleConector | Proyecto local previo (Python) |
 | AulaVirtualSync | Fork propio de MoodleConector, pensado para cualquier estudiante: [`Sebastian-Alvarez/AulaVirtualSync`](https://github.com/Sebastian-Alvarez/AulaVirtualSync) |
 | `validate_usm.py` | Script de validación de la fase 1 (fuera del repositorio) |

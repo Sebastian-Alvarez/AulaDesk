@@ -15,6 +15,11 @@ nav = [
   { "ADR" = [
     "adr/index.md",
     { "0001 · Entorno de desarrollo" = "adr/0001-entorno-de-desarrollo.md" },
+    { "0002 · Diagramas C4 como código" = "adr/0002-diagramas-c4-como-codigo.md" },
+  ] },
+  { "Diagramas" = [
+    { "Arquitectura (C4)" = "https://sebastian-alvarez.github.io/AulaDesk/arquitectura/" },
+    { "Login" = "diagramas/login.md" },
   ] },
   { "Validación" = [
     { "Fase 1 (2026-11-07)" = "validacion/fase-1.md" },
