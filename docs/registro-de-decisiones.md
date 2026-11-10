@@ -2,7 +2,7 @@
 title: AulaDesk - Registro de decisiones
 project: AulaDesk (nombre temporal)
 stage: Análisis y diseño inicial
-updated: 2026-11-06
+updated: 2026-11-07
 ---
 
 # AulaDesk - Registro de decisiones
@@ -12,7 +12,7 @@ AulaDesk es un nombre temporal. El nombre definitivo no puede incluir "Moodle", 
 | Campo | Valor |
 |---|---|
 | Etapa | Análisis y diseño inicial |
-| Última actualización | 2026-11-06 |
+| Última actualización | 2026-11-07 |
 | Estados usados | Decidido, Pospuesto, Pendiente, Propuesto |
 
 ## Contenido
@@ -47,7 +47,7 @@ Una aplicación de escritorio que se conecta a cualquier instancia de Moodle med
 
 ### 1.3 Antecedente
 
-MoodleConector, un toolkit propio en Python, demostró que el login mediante `launch.php` funciona con el SSO y la MFA de la USM, y que el token de la API persiste sin necesidad de iniciar sesión a diario.
+MoodleConector, un toolkit propio en Python, demostró que el login mediante `launch.php` funciona con el SSO y la MFA de la USM, y que el token de la API persiste sin necesidad de iniciar sesión a diario. El mismo flujo funciona en AulaVirtualSync, un fork propio que además guarda la clave de cifrado en el keyring del sistema operativo.
 
 ---
 
@@ -76,6 +76,12 @@ MoodleConector, un toolkit propio en Python, demostró que el login mediante `la
 | RF-06 | Cálculo de la nota del ramo y de la asistencia, sujeto a los datos que entregue cada instancia. |
 | RF-07 | Vista personalizada del contenido de los cursos. |
 | RF-08 | Acceso al sitio real para interactuar: foros, cuestionarios y entregas. |
+
+Alcance confirmado por la [validación de la fase 1](validacion/fase-1.md):
+
+- **RF-03:** `course_sync.py` de AulaVirtualSync sirve de referencia: filtro por semestre, archivos ignorados, nombre de carpeta por ramo y accesos directos para enlaces externos.
+- **RF-06, nota del ramo:** las ponderaciones solo vienen en los ítems ya calificados, así que el usuario debe ingresar las del programa del ramo.
+- **RF-06, asistencia:** la USM no expone funciones `mod_attendance_*`. Queda limitada mientras no haya otra vía por API.
 
 ### 3.2 Requisitos no funcionales
 
@@ -205,17 +211,27 @@ La base de datos no guarda tokens (van en el keyring del sistema operativo), arc
 
 - El login se realiza en el navegador externo mediante `launch.php`. La app nunca ve la contraseña ni el segundo factor.
 - El token llega a la app por deep link (`moodlemobile://`), con instancia única.
-- Cada login genera un passport aleatorio y la app verifica la firma `md5(url + passport)`. Se rechaza cualquier token que no provenga de un login iniciado por la app.
+- Cada login genera un passport aleatorio y la app verifica la firma `md5(wwwroot + passport)`, con la `wwwroot` sin `/` final. Se rechaza cualquier token que no provenga de un login iniciado por la app.
+- Validado en la USM con el SSO de Microsoft y MFA, desde el navegador del sistema.
 
 **D-14 Sesión.** El token persiste, se valida antes de usarse y solo se vuelve a pedir login si Moodle lo rechaza. Es el mecanismo de MoodleConector, con tres cambios: navegador del sistema en lugar de Playwright, verificación de la firma y keyring en lugar de un archivo cifrado.
 
+Moodle reutiliza el token y el `privatetoken` por usuario y servicio: un login nuevo no los renueva. Solo se invalidan al reiniciar la clave de seguridad o cuando caducan, por lo que cerrar sesión en la app no los revoca en el servidor.
+
 **D-15 Autologin.** Se implementa como opción por instancia, mediante `tool_mobile_get_autologin_key`, con alternativa automática al enlace normal si el sitio no lo soporta. El `privatetoken` se guarda desde la fase 1.
+
+Restricciones comprobadas en la USM:
+
+- `tool_mobile_get_autologin_key` exige un User-Agent que contenga `MoodleMobile`; sin él responde `apprequired`.
+- Se permite una clave cada 6 minutos (`tool_mobile_autologinmintimebetweenreq = 360`). El WebView conserva la sesión tras el primer autologin y abre el enlace normal mientras dure el límite.
 
 ### 5.6 Visualización
 
-**D-16 Vista de cursos.** La vista propia, construida con la API, es la vista por defecto, con la opción de ver el curso en su formato normal.
+**D-16 Vista de cursos.** La vista propia, construida con la API, es la vista por defecto, con la opción de ver el curso en su formato normal. Compacta u oculta las etiquetas (`label`) y las secciones vacías, la principal fuente del desorden: en la USM, 164 de 303 actividades son etiquetas.
 
 **D-17 Sitio real.** Se abre dentro de la app, en un WebView aislado, para poder controlar cómo se presenta el contenido. Los cuestionarios, foros y entregas se realizan en el sitio real.
+
+El sitio se muestra en una ventana o webview nativa de Tauri, no en un `<iframe>`: la política `frame-ancestors` del aula solo permite `localhost` y los esquemas de la app oficial, así que un `<iframe>` funcionaría en desarrollo y fallaría en la app instalada.
 
 ### 5.7 Notificaciones e integraciones
 
@@ -232,6 +248,8 @@ La base de datos no guarda tokens (van en el keyring del sistema operativo), arc
 |---|---|---|
 | Simple | URL iCal del propio Moodle | Sin login adicional |
 | Integrado | API de Google Calendar con login | Calendario personalizado y automatizaciones |
+
+La exportación iCal está activa en la USM.
 
 ### 5.8 Publicación y documentación
 
@@ -257,7 +275,7 @@ La base de datos no guarda tokens (van en el keyring del sistema operativo), arc
 |---|---|---|
 | P-01 | Local-first: si la base local es la fuente de verdad de la interfaz | Diseño detallado |
 | P-02 | Prioridad entre objetivos | Planificación de la primera versión |
-| P-03 | Autologin activado por defecto | Diseño detallado |
+| P-03 | Autologin activado por defecto (la validación lo respalda en la USM) | Diseño detallado |
 | P-04 | Formato de la exportación de calificaciones | Diseño detallado |
 | P-05 | Diagrama de secuencia sincronización → notificación | Al terminar la etapa exploratoria |
 | P-06 | Acciones dentro de las notificaciones | Después de la fase 2 |
@@ -289,6 +307,7 @@ El identificador de la app (P-12) debe definirse antes de publicar: cambiarlo de
 | Token y `privatetoken` solo en el keyring del sistema operativo; nunca en SQLite, archivos ni logs | Propuesto |
 | WebView del sitio real aislado, sin permisos hacia el backend | Propuesto |
 | Solo conexiones HTTPS hacia Moodle | Propuesto |
+| Indicar al usuario cómo revocar el token (reiniciar la clave de seguridad), porque cerrar sesión no lo invalida | Propuesto |
 
 ### 7.3 Marca
 
@@ -300,10 +319,13 @@ El identificador de la app (P-12) debe definirse antes de publicar: cambiarlo de
 
 ## 8. Validación en la fase 1
 
-- [ ] Funciones de la API habilitadas para alumnos (`core_webservice_get_site_info`).
-- [ ] Funcionamiento del autologin en la USM.
-- [ ] Disponibilidad del plugin de asistencia (`mod_attendance_*`).
-- [ ] Disponibilidad de la exportación iCal de Moodle.
+Realizada el 2026-11-07. El detalle está en el [informe de validación](validacion/fase-1.md).
+
+- [x] Funciones de la API habilitadas para alumnos (`core_webservice_get_site_info`): 463 funciones, incluidas todas las previstas.
+- [x] Funcionamiento del autologin en la USM: funciona, con las restricciones de D-15.
+- [x] Disponibilidad del plugin de asistencia (`mod_attendance_*`): no hay funciones disponibles.
+- [x] Disponibilidad de la exportación iCal de Moodle: activa.
+- [ ] Asistencia mediante `tool_mobile_get_plugins_supporting_mobile` y `tool_mobile_get_content` (pendiente).
 
 ---
 
@@ -317,6 +339,10 @@ El identificador de la app (P-12) debe definirse antes de publicar: cambiarlo de
 | Google Calendar solo se suscribe a URL públicas | No puede leer un archivo local | Modo simple con la URL iCal de Moodle (D-19) |
 | Notificaciones en Windows requieren la app instalada; las acciones en Linux dependen del entorno de escritorio | Comportamiento distinto en desarrollo y entre escritorios | Probar con instaladores; acciones pospuestas (P-06) |
 | Uso automatizado de la API | Posible conflicto con políticas de TI de cada institución | Volumen moderado de peticiones y sincronización incremental |
+| Gateway (`MindFreeWebGateway`) delante del aula de la USM | Podría limitar o bloquear clientes automatizados | Volumen moderado y reintentos con espera |
+| Límite de una clave de autologin cada 6 minutos | Abrir varias páginas seguidas podría pedir login | Conservar la sesión del WebView (D-15) |
+| Un token o `privatetoken` filtrado sigue válido hasta reiniciar la clave de seguridad | Acceso no autorizado a la cuenta | Nunca registrarlos en logs, capturas ni informes (7.2) |
+| El login por navegador externo depende de que la instancia siga aceptando `launch.php` (en la USM, con `typeoflogin = 3`) | El login deja de funcionar | Activar el respaldo con WebView (P-08) |
 
 ---
 
@@ -341,6 +367,9 @@ El identificador de la app (P-12) debe definirse antes de publicar: cambiarlo de
 | Diagramas C4 (niveles 1 y 2) | Lucidchart: "AulaDesk - C4 Diagrams" |
 | Diagrama de secuencia del login | Mermaid |
 | MoodleConector | Proyecto local previo (Python) |
+| AulaVirtualSync | Fork propio de MoodleConector, pensado para cualquier estudiante: [`Sebastian-Alvarez/AulaVirtualSync`](https://github.com/Sebastian-Alvarez/AulaVirtualSync) |
+| `validate_usm.py` | Script de validación de la fase 1 (fuera del repositorio) |
+| Informe de validación | [Validación de la fase 1](validacion/fase-1.md) |
 
 ### 11.2 Proyectos relacionados
 
@@ -350,6 +379,7 @@ El identificador de la app (P-12) debe definirse antes de publicar: cambiarlo de
 | Muster | App de escritorio similar (Tauri y keyring) para el Moodle de Monash | No verificada |
 | Edu Sync | CLI en Rust para sincronizar Moodle; solo como referencia de lectura | GPL-3.0 |
 | moodle-dl | Descargador y notificador mediante la API móvil | No verificada |
+| `Jabir-Srj/moodle-connector` | Proyecto del que deriva MoodleConector; el flujo con `launch.php` llegó en su PR #1, de SebaG20xx | MIT |
 
 ---
 
@@ -364,4 +394,5 @@ El identificador de la app (P-12) debe definirse antes de publicar: cambiarlo de
 | Local-first | Enfoque en que la copia local de los datos es la fuente de verdad de la interfaz. |
 | Passport | Valor aleatorio que la app genera en cada login para verificar que el token recibido corresponde a una solicitud propia. |
 | `privatetoken` | Token adicional que entrega Moodle en el login y que permite solicitar el autologin. |
+| Clave de seguridad | En Moodle, el token de un servicio, visible en Preferencias → Claves de seguridad. Reiniciarla revoca el token y el `privatetoken`. |
 | WebView | Componente que muestra contenido web dentro de una aplicación de escritorio. |
