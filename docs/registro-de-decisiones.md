@@ -2,7 +2,7 @@
 title: AulaDesk - Registro de decisiones
 project: AulaDesk (nombre temporal)
 stage: Análisis y diseño inicial
-updated: 2026-11-07
+updated: 2026-11-08
 ---
 
 # AulaDesk - Registro de decisiones
@@ -12,7 +12,7 @@ AulaDesk es un nombre temporal. El nombre definitivo no puede incluir "Moodle", 
 | Campo | Valor |
 |---|---|
 | Etapa | Análisis y diseño inicial |
-| Última actualización | 2026-11-07 |
+| Última actualización | 2026-11-08 |
 | Estados usados | Decidido, Pospuesto, Pendiente, Propuesto |
 
 ## Contenido
@@ -59,6 +59,8 @@ MoodleConector, un toolkit propio en Python, demostró que el login mediante `la
 | No anticipar (YAGNI) | No construir por adelantado lo que podría necesitarse, para no dejar integraciones incompletas. |
 | Qué antes que cómo | En esta etapa se define qué hace el sistema; la implementación se define en el diseño detallado. |
 | Secretos fuera del repositorio | Ningún token, credencial ni dato personal debe llegar al control de versiones. |
+| Siempre fijar versiones | Toda herramienta, dependencia y entorno tiene su versión fijada en el repositorio. Nada se actualiza sin un PR que pase la CI. |
+| Todo como código | Todo lo necesario para compilar, probar y levantar servicios vive en el repositorio, con un único punto de entrada que se usa igual en la máquina local y en la CI. |
 
 ---
 
@@ -130,6 +132,12 @@ Alcance confirmado por la [validación de la fase 1](validacion/fase-1.md):
 | D-24 | Registro de decisiones | ADR en formato MADR mínimo; este documento como índice | Decidido |
 | D-25 | Sitio de documentación | Zensical (mdBook como alternativa) | Decidido |
 | D-26 | Diagramas | C4 en Lucidchart; diagramas de secuencia en Mermaid | Decidido |
+| D-27 | Entorno de desarrollo | Windows con RustRover; Linux en dual boot para validar | Decidido |
+| D-28 | Herramientas de calidad | rustfmt, clippy, cargo-deny, cargo-nextest, cargo-llvm-cov, cargo-machete, mockito e insta | Decidido |
+| D-29 | Hooks y tareas | prek con `.pre-commit-config.yaml`; tareas con `just` | Decidido |
+| D-30 | Flujo de Git | Conventional Commits, PR con regla en `main` y Dependabot | Decidido |
+| D-31 | Moodle de pruebas | Instancia local en Docker, definida en el repositorio | Decidido |
+| D-32 | CI | Linux en cada push y Windows en los PR mientras el repositorio sea privado | Decidido |
 
 ---
 
@@ -255,7 +263,7 @@ La exportación iCal está activa en la USM.
 
 **D-20 Licencia.** Apache 2.0. Es compatible con todas las dependencias del proyecto y con GPLv3, en caso de un cambio futuro (que no sería retroactivo).
 
-**D-21 Visibilidad del repositorio.** Privado durante la fase 1. Público cuando la CLI funcione, con un README que indique que el proyecto está en desarrollo.
+**D-21 Visibilidad del repositorio.** Privado durante la fase 1. Público al pasar a la fase 2, cuando la CLI funcione, con un README que indique que el proyecto está en desarrollo.
 
 **D-22 Nombre.** AulaDesk como nombre temporal (`auladesk-core`, `auladesk-cli`, `auladesk-desktop`).
 
@@ -266,6 +274,70 @@ La exportación iCal está activa en la USM.
 **D-25 Sitio de documentación.** Zensical, sucesor de Material for MkDocs. mdBook queda como alternativa según el formato y el diseño; no se cambia por ahora.
 
 **D-26 Diagramas.** Diagramas C4 en Lucidchart, en el documento "AulaDesk - C4 Diagrams" (niveles 1 y 2). Diagramas de secuencia en Mermaid.
+
+### 5.9 Entorno de desarrollo
+
+El detalle, con las alternativas consideradas, está en el ADR [Entorno de desarrollo](adr/0001-entorno-de-desarrollo.md).
+
+**D-27 Entorno de desarrollo.**
+
+- Sistema principal: Windows, en el computador de escritorio. Linux en dual boot en el ThinkPad cuando se necesite un entorno Linux completo (WebKitGTK, bandeja, Secret Service, registro del deep link).
+- Editor: RustRover, con la licencia educativa de JetBrains (GitHub Student Developer Pack). Su HTTP Client se usa para explorar la API y su visor de bases de datos para SQLite. Bruno queda como alternativa si el HTTP Client no basta.
+- Si compilar en el ThinkPad resulta muy lento: desarrollo remoto de RustRover, con el escritorio como servidor.
+- Rust fijado con `rust-toolchain.toml` (`channel = "1.99"`, componentes `rustfmt`, `clippy` y `llvm-tools-preview`).
+- `.gitattributes` con `* text=auto eol=lf`, para no mezclar finales de línea entre Windows y Linux.
+- La toolchain de JavaScript se define en la fase 2 (P-13).
+
+**D-28 Herramientas de calidad.**
+
+| Herramienta | Uso |
+|---|---|
+| `rustfmt` | Formato estándar. `rustfmt.toml` mínimo, con `edition` y `style_edition`. RustRover formatea con rustfmt al guardar. |
+| `clippy` | Linter, con `-D warnings` |
+| `cargo-deny` | Licencias compatibles con Apache 2.0 (D-20), vulnerabilidades (RustSec), dependencias duplicadas y orígenes |
+| `cargo-nextest` | Ejecución de tests |
+| `cargo-llvm-cov` | Cobertura de tests; el umbral y la publicación se definen después (P-15) |
+| `cargo-machete` | Dependencias declaradas sin usar, en la CI |
+| `mockito` | Servidor HTTP simulado para los tests del cliente de la API, con `assert_on_drop` |
+| `insta` | Tests de snapshot |
+
+Descartados: `bacon` (redundante con RustRover) y `cargo-audit` (cubierto por `cargo-deny`).
+
+**D-29 Hooks y tareas.**
+
+- prek ejecuta `.pre-commit-config.yaml`, el formato estándar de pre-commit, sin depender de Python, e instala cada herramienta con su versión fijada.
+
+| Momento | Revisión |
+|---|---|
+| pre-commit | Betterleaks y `rustfmt` |
+| commit-msg | Conventional Commits |
+| pre-push | `clippy` y tests |
+
+- `just` es el único punto de entrada para las tareas (`just check`, `just test`, `just coverage`, `just moodle-up`). La CI usa los mismos comandos.
+
+**D-30 Flujo de Git.**
+
+- Mensajes con Conventional Commits, validados por el hook `commit-msg`.
+- Los cambios llegan a `main` mediante PR, con una regla que exige pasar la CI. En un repositorio privado requiere GitHub Pro, incluido en el GitHub Student Developer Pack.
+- Dependabot actualiza crates, GitHub Actions, hooks y la versión de Rust.
+- `Cargo.lock` se versiona.
+
+**D-31 Moodle de pruebas.**
+
+- Instancia local de Moodle 4.5 (la versión de la USM) en Docker, definida en `dev/moodle/` y levantada con `just moodle-up`.
+- Configuración y datos de ejemplo automáticos: servicios web y servicio móvil, un usuario estudiante de prueba, cursos, calificaciones, tareas y eventos.
+- El código de Moodle (GPL) se descarga al iniciar, con un tag fijo, y no se incluye en el repositorio (D-20).
+- Se usa para el desarrollo diario, el HTTP Client y los tests de integración. La USM real se usa solo para validar lo que no se reproduce localmente (SSO y MFA, gateway, autologin, CSP), mediante la CLI o `validate_usm.py`.
+
+**D-32 CI.**
+
+| Etapa | Cada push | PR hacia `main` |
+|---|---|---|
+| Repositorio privado (fase 1) | Linux: revisiones en un solo job y tests | Linux y Windows; cobertura en Linux; tests de integración con el Moodle de pruebas |
+| Repositorio público (fase 2) | Linux y Windows | Igual que en la fase 1 |
+
+- Caché de compilación, cancelación de ejecuciones obsoletas y exclusión de los cambios que solo afectan a `docs/`.
+- Las compilaciones completas de la app (instaladores) corren solo en los PR hacia `main` o al crear una versión.
 
 ---
 
@@ -285,6 +357,9 @@ La exportación iCal está activa en la USM.
 | P-10 | Integración con Notion u otras herramientas | Sin fecha |
 | P-11 | Traducción de la interfaz | Sin fecha |
 | P-12 | Primera versión pública: nombre definitivo, identificador de la app, firma en Windows, canales de distribución, actualizaciones automáticas, modelo e identidad visual | Antes de la primera versión pública |
+| P-13 | Toolchain de JavaScript: pnpm o npm, y cómo fijar la versión de Node | Fase 2 |
+| P-14 | `proptest`, `cargo doc` sin advertencias y `typos` | Cuando el núcleo lo requiera (`proptest` con RF-06) |
+| P-15 | Umbral mínimo de cobertura y publicación de resultados (Codecov o similar) | Cuando el núcleo tenga tests |
 
 El identificador de la app (P-12) debe definirse antes de publicar: cambiarlo después hace que los usuarios pierdan su configuración y su sesión.
 
@@ -296,9 +371,10 @@ El identificador de la app (P-12) debe definirse antes de publicar: cambiarlo de
 
 | Medida | Estado |
 |---|---|
-| `.gitignore` estricto desde el primer commit: bases de datos locales, cachés, `.env`, credenciales, respuestas guardadas de la API y descargas | Decidido |
-| Escáner de secretos (`gitleaks`) como hook previo al commit y en la CI | Propuesto |
-| Revisión del historial completo con el escáner antes de hacer público el repositorio | Propuesto |
+| `.gitignore` estricto desde el primer commit: bases de datos locales, cachés, `.env`, credenciales, respuestas guardadas de la API (incluida `.idea/httpRequests/`), `http-client.private.env.json` y descargas | Decidido |
+| Escáner de secretos (`betterleaks`) como hook previo al commit, ejecutado por prek con versión fijada, y en la CI | Decidido |
+| Regla propia de Betterleaks para detectar valores de `wstoken` y `privatetoken` | Decidido |
+| Revisión del historial completo con el escáner antes de hacer público el repositorio, incluidas las fixtures de los tests | Propuesto |
 
 ### 7.2 Seguridad de la aplicación
 
@@ -308,6 +384,7 @@ El identificador de la app (P-12) debe definirse antes de publicar: cambiarlo de
 | WebView del sitio real aislado, sin permisos hacia el backend | Propuesto |
 | Solo conexiones HTTPS hacia Moodle | Propuesto |
 | Indicar al usuario cómo revocar el token (reiniciar la clave de seguridad), porque cerrar sesión no lo invalida | Propuesto |
+| Token de la USM durante el desarrollo: nunca en archivos; solo a través de la CLI (keyring) o de `validate_usm.py`. El HTTP Client usa únicamente el token de prueba del Moodle local (D-31). Si el token se filtra, reiniciar la clave de seguridad. | Decidido |
 
 ### 7.3 Marca
 
@@ -355,6 +432,7 @@ Realizada el 2026-11-07. El detalle está en el [informe de validación](validac
 | Material for MkDocs como generador del sitio | Llegó al fin de su soporte el 2026-11-05; se reemplaza por Zensical. |
 | Notion como parte del alcance | Fue una sugerencia durante el análisis, no un requisito; queda pospuesta (P-10). |
 | Suscripción ICS desde un archivo local | Google y Outlook requieren una URL pública. |
+| `gitleaks` como escáner de secretos | Desde marzo de 2026 solo recibe parches de seguridad. Se reemplaza por Betterleaks, su sucesor del mismo autor, por su mayor cobertura de tipos de secretos. |
 
 ---
 
@@ -395,4 +473,6 @@ Realizada el 2026-11-07. El detalle está en el [informe de validación](validac
 | Passport | Valor aleatorio que la app genera en cada login para verificar que el token recibido corresponde a una solicitud propia. |
 | `privatetoken` | Token adicional que entrega Moodle en el login y que permite solicitar el autologin. |
 | Clave de seguridad | En Moodle, el token de un servicio, visible en Preferencias → Claves de seguridad. Reiniciarla revoca el token y el `privatetoken`. |
+| Conventional Commits | Convención para los mensajes de commit (`feat:`, `fix:`, etc.) que permite generar el changelog automáticamente. |
+| Hook de Git | Script que Git ejecuta en ciertos momentos (antes de un commit o de un push) y que cancela la operación si falla. |
 | WebView | Componente que muestra contenido web dentro de una aplicación de escritorio. |
