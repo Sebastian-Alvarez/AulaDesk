@@ -155,6 +155,8 @@ Alcance confirmado por la [validación de la fase 1](validacion/fase-1.md):
 
 ### 5.2 Arquitectura y tecnología
 
+El detalle, con las alternativas consideradas, está en los ADR [Arquitectura](adr/0003-arquitectura.md) y [Tecnología](adr/0004-tecnologia.md).
+
 **D-05 Modelo de proceso.** Una sola aplicación residente en la bandeja del sistema, con el mismo comportamiento que Discord o Spotify: cerrar la ventana no detiene la sincronización ni las notificaciones, y "Salir" cierra la app por completo. No hay un servicio separado ni comunicación entre procesos.
 
 **D-06 Arquitectura.** Hexagonal con bus de eventos:
@@ -215,6 +217,8 @@ La base de datos no guarda tokens (van en el keyring del sistema operativo), arc
 
 ### 5.5 Login y sesión
 
+El detalle, con las alternativas consideradas, está en el ADR [Login y sesión](adr/0005-login-y-sesion.md). El flujo completo está en el [diagrama de secuencia del login](diagramas/login.md).
+
 **D-13 Login.**
 
 - El login se realiza en el navegador externo mediante `launch.php`. La app nunca ve la contraseña ni el segundo factor.
@@ -234,6 +238,8 @@ Restricciones comprobadas en la USM:
 - Se permite una clave cada 6 minutos (`tool_mobile_autologinmintimebetweenreq = 360`). El WebView conserva la sesión tras el primer autologin y abre el enlace normal mientras dure el límite.
 
 ### 5.6 Visualización
+
+El detalle, con las alternativas consideradas, está en el ADR [Vista de cursos y sitio real](adr/0006-vista-de-cursos-y-sitio-real.md).
 
 **D-16 Vista de cursos.** La vista propia, construida con la API, es la vista por defecto, con la opción de ver el curso en su formato normal. Compacta u oculta las etiquetas (`label`) y las secciones vacías, la principal fuente del desorden: en la USM, 164 de 303 actividades son etiquetas.
 

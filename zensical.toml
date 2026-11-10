@@ -16,6 +16,10 @@ nav = [
     "adr/index.md",
     { "0001 · Entorno de desarrollo" = "adr/0001-entorno-de-desarrollo.md" },
     { "0002 · Diagramas C4 como código" = "adr/0002-diagramas-c4-como-codigo.md" },
+    { "0003 · Arquitectura" = "adr/0003-arquitectura.md" },
+    { "0004 · Tecnología" = "adr/0004-tecnologia.md" },
+    { "0005 · Login y sesión" = "adr/0005-login-y-sesion.md" },
+    { "0006 · Vista de cursos y sitio real" = "adr/0006-vista-de-cursos-y-sitio-real.md" },
   ] },
   { "Diagramas" = [
     { "Arquitectura (C4)" = "https://sebastian-alvarez.github.io/AulaDesk/arquitectura/" },
