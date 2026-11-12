@@ -1,7 +1,36 @@
 # Actualizaciones automáticas de versiones fijadas (D-30).
-# Se agregan cargo, hooks y la versión de Rust cuando existan en el repositorio.
 version: 2
 updates:
+  - package-ecosystem: cargo
+    directory: /
+    schedule:
+      interval: weekly
+    commit-message:
+      prefix: chore
+      include: scope
+    groups:
+      cargo:
+        patterns: ["*"]
+
+  - package-ecosystem: rust-toolchain
+    directory: /
+    schedule:
+      interval: weekly
+    commit-message:
+      prefix: chore
+      include: scope
+
+  - package-ecosystem: pre-commit
+    directory: /
+    schedule:
+      interval: weekly
+    commit-message:
+      prefix: chore
+      include: scope
+    groups:
+      hooks:
+        patterns: ["*"]
+
   - package-ecosystem: github-actions
     directory: /
     schedule:

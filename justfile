@@ -16,6 +16,42 @@ export STRUCTURIZR_USER := if os_family() == "unix" { `id -u` + ":" + `id -g` } 
 default:
     @just --list
 
+# --- Rust (D-28) ---
+
+# Revisiones de Rust: formato, clippy y cargo-deny
+check: fmt-check clippy deny
+
+# Formatea el código
+fmt:
+    cargo fmt --all
+
+# Verifica el formato sin modificar archivos
+fmt-check:
+    cargo fmt --all --check
+
+# Linter; cualquier advertencia es un error
+clippy:
+    cargo clippy --workspace --all-targets --all-features --locked -- -D warnings
+
+# Licencias, vulnerabilidades (RustSec), dependencias duplicadas y orígenes
+deny:
+    cargo deny --locked check
+
+# Dependencias declaradas sin usar
+machete:
+    cargo machete
+
+# --no-tests=warn: mientras el workspace no tenga tests, no se considera un error.
+# Tests con cargo-nextest
+test:
+    cargo nextest run --workspace --all-features --locked --no-tests=warn
+
+# Cobertura de los tests; resumen en la terminal (umbral y publicación: P-15)
+coverage:
+    cargo llvm-cov nextest --workspace --all-features --locked --no-tests=warn
+
+# --- Documentación (D-23, D-26) ---
+
 # Vista previa de la documentación en http://localhost:8000, con recarga automática
 docs-serve:
     {{ docs }} zensical serve

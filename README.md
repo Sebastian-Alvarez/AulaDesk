@@ -27,6 +27,16 @@ just docs-serve   # vista previa en http://localhost:8000
 just docs-build   # construye el sitio en site/
 ```
 
+## Desarrollo
+
+El núcleo y la CLI están en Rust, en un workspace de Cargo (`auladesk-core` y `auladesk-cli`). Para preparar el entorno se necesitan [rustup](https://rustup.rs/), [`just`](https://just.systems/), [prek](https://prek.j178.dev/) y las herramientas de cargo indicadas en [`CONTRIBUTING.md`](CONTRIBUTING.md#requisitos). La versión de Rust está fijada en `rust-toolchain.toml` y rustup la instala al compilar por primera vez.
+
+```sh
+prek install   # activa los hooks de Git (una vez por copia del repositorio)
+just check     # formato, clippy y cargo-deny
+just test      # tests
+```
+
 ## Contribuir
 
 Cómo reportar problemas y el flujo de trabajo con Git están en [`CONTRIBUTING.md`](CONTRIBUTING.md). Las vulnerabilidades se reportan en privado, según la [política de seguridad](SECURITY.md).

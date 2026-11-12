@@ -1,0 +1,7 @@
+# Versión de Rust del proyecto (D-27).
+# rustup instala esta versión y sus componentes al compilar por primera vez.
+# Dependabot propone las versiones nuevas.
+[toolchain]
+channel = "1.99.1"
+components = ["rustfmt", "clippy", "llvm-tools-preview"]
+profile = "minimal"

@@ -1,0 +1,44 @@
+# Configuración de cargo-deny (D-28). Se ejecuta con: just deny
+
+[graph]
+# Plataformas del proyecto (D-03): Windows y Linux
+targets = ["x86_64-pc-windows-msvc", "x86_64-unknown-linux-gnu"]
+all-features = true
+
+# Vulnerabilidades y avisos de RustSec
+[advisories]
+unmaintained = "all"
+unsound = "all"
+ignore = []
+
+# Licencias compatibles con Apache 2.0 (D-20).
+# Se agregan otras solo cuando una dependencia las necesite.
+[licenses]
+allow = [
+    "Apache-2.0",
+    "Apache-2.0 WITH LLVM-exception",
+    "BSD-2-Clause",
+    "BSD-3-Clause",
+    "ISC",
+    "MIT",
+    "Unicode-3.0",
+    "Zlib",
+]
+confidence-threshold = 0.93
+# Que una licencia de la lista no esté en uso no es un error
+unused-allowed-license = "allow"
+exceptions = []
+
+# Los crates del workspace no se publican en crates.io
+[licenses.private]
+ignore = true
+
+# Dependencias duplicadas y comodines
+[bans]
+multiple-versions = "warn"
+wildcards = "deny"
+
+# Orígenes: solo crates.io
+[sources]
+unknown-registry = "deny"
+unknown-git = "deny"

@@ -293,7 +293,7 @@ El detalle, con las alternativas consideradas, está en el ADR [Entorno de desar
 - Sistema principal: Windows, en el computador de escritorio. Linux en dual boot en el ThinkPad cuando se necesite un entorno Linux completo (WebKitGTK, bandeja, Secret Service, registro del deep link).
 - Editor: RustRover, con la licencia educativa de JetBrains (GitHub Student Developer Pack). Su HTTP Client se usa para explorar la API y su visor de bases de datos para SQLite. Bruno queda como alternativa si el HTTP Client no basta.
 - Si compilar en el ThinkPad resulta muy lento: desarrollo remoto de RustRover, con el escritorio como servidor.
-- Rust fijado con `rust-toolchain.toml` (`channel = "1.99"`, componentes `rustfmt`, `clippy` y `llvm-tools-preview`).
+- Rust fijado con `rust-toolchain.toml` en una versión exacta (`channel = "1.99.1"`, componentes `rustfmt`, `clippy` y `llvm-tools-preview`); Dependabot propone las versiones nuevas.
 - `.gitattributes` con `* text=auto eol=lf`, para no mezclar finales de línea entre Windows y Linux.
 - La toolchain de JavaScript se define en la fase 2 (P-13).
 
@@ -326,7 +326,7 @@ Descartados: `bacon` (redundante con RustRover) y `cargo-audit` (cubierto por `c
 
 **D-30 Flujo de Git.**
 
-- Mensajes con Conventional Commits, validados por el hook `commit-msg`.
+- Mensajes con Conventional Commits, validados en el hook `commit-msg` con [`committed`](https://github.com/crate-ci/committed) (escrito en Rust; configuración en `committed.toml`). Se descartó `conventional-pre-commit` porque requiere Python.
 - Los cambios llegan a `main` mediante PR, con una regla que exige pasar la CI.
 - Estrategia de ramas: GitHub Flow. `main` es la única rama permanente. Cada cambio se hace en una rama corta creada desde `main`, que se integra con squash merge y se borra al integrarse. El título del PR queda como mensaje del commit en `main`, por lo que también sigue Conventional Commits.
 - Nombres de rama: `tipo/descripcion-corta`, en inglés y en minúsculas con guiones, con los tipos de Conventional Commits (`feat/`, `fix/`, `docs/`, `refactor/`, `test/`, `ci/`, `chore/`). `spike/` se usa para experimentos que pueden descartarse sin integrarse.
