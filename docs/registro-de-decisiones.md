@@ -2,7 +2,7 @@
 title: AulaDesk - Registro de decisiones
 project: AulaDesk (nombre temporal)
 stage: Análisis y diseño inicial
-updated: 2026-11-11
+updated: 2026-11-12
 ---
 
 # AulaDesk - Registro de decisiones
@@ -12,7 +12,7 @@ AulaDesk es un nombre temporal. El nombre definitivo no puede incluir "Moodle", 
 | Campo | Valor |
 |---|---|
 | Etapa | Análisis y diseño inicial |
-| Última actualización | 2026-11-11 |
+| Última actualización | 2026-11-12 |
 | Estados usados | Decidido, Pospuesto, Pendiente, Propuesto |
 
 ## Contenido
@@ -126,7 +126,7 @@ Alcance confirmado por la [validación de la fase 1](validacion/fase-1.md):
 | D-18 | Notificaciones | Nativas, centro propio, contador en bandeja y modos configurables | Decidido |
 | D-19 | Calendario | Modo simple (iCal de Moodle) y modo integrado (Google Calendar API) | Decidido |
 | D-20 | Licencia | Apache 2.0 | Decidido |
-| D-21 | Visibilidad del repositorio | Privado en la fase 1; público con la CLI funcionando | Decidido |
+| D-21 | Visibilidad del repositorio | Público desde la fase 1, indicando que está en desarrollo | Decidido |
 | D-22 | Nombre | AulaDesk como nombre temporal | Decidido |
 | D-23 | Documentación | Carpeta `docs/`, publicada con GitHub Pages desde la fase 1 | Decidido |
 | D-24 | Registro de decisiones | ADR en formato MADR mínimo; este documento como índice | Decidido |
@@ -137,7 +137,7 @@ Alcance confirmado por la [validación de la fase 1](validacion/fase-1.md):
 | D-29 | Hooks y tareas | prek con `.pre-commit-config.yaml`; tareas con `just` | Decidido |
 | D-30 | Flujo de Git | GitHub Flow con ramas cortas, Conventional Commits, PR con regla en `main` y Dependabot | Decidido |
 | D-31 | Moodle de pruebas | Instancia local en Docker, definida en el repositorio | Decidido |
-| D-32 | CI | Linux en cada push y Windows en los PR mientras el repositorio sea privado | Decidido |
+| D-32 | CI | Linux y Windows en cada push | Decidido |
 
 ---
 
@@ -269,11 +269,14 @@ La exportación iCal está activa en la USM.
 
 **D-20 Licencia.** Apache 2.0. Es compatible con todas las dependencias del proyecto y con GPLv3, en caso de un cambio futuro (que no sería retroactivo).
 
-**D-21 Visibilidad del repositorio.** Privado durante la fase 1. Público al pasar a la fase 2, cuando la CLI funcione, con un README que indique que el proyecto está en desarrollo.
+**D-21 Visibilidad del repositorio.** Público desde la fase 1, con un README que indica que el proyecto está en desarrollo.
+
+- Cambia la decisión original, que lo dejaba privado hasta que la CLI funcionara (fase 2).
+- Al abrirlo se revisó el historial completo en busca de secretos (7.1).
 
 **D-22 Nombre.** AulaDesk como nombre temporal (`auladesk-core`, `auladesk-cli`, `auladesk-desktop`).
 
-**D-23 Documentación.** Se escribe en `docs/` dentro del repositorio y se publica con GitHub Pages desde la fase 1, aunque el repositorio sea privado. El sitio es público y solo contiene documentación, sin código ni secretos. La publicación se controla con la variable `PAGES_ENABLED` del workflow Docs.
+**D-23 Documentación.** Se escribe en `docs/` dentro del repositorio y se publica con GitHub Pages desde la fase 1. El sitio es público y solo contiene documentación, sin código ni secretos. La publicación se controla con la variable `PAGES_ENABLED` del workflow Docs.
 
 **D-24 Registro de decisiones.** Un ADR por decisión importante, en formato MADR (variante mínima), en `docs/adr/`. Este documento funciona como índice.
 
@@ -324,7 +327,7 @@ Descartados: `bacon` (redundante con RustRover) y `cargo-audit` (cubierto por `c
 **D-30 Flujo de Git.**
 
 - Mensajes con Conventional Commits, validados por el hook `commit-msg`.
-- Los cambios llegan a `main` mediante PR, con una regla que exige pasar la CI. En un repositorio privado requiere GitHub Pro, incluido en el GitHub Student Developer Pack.
+- Los cambios llegan a `main` mediante PR, con una regla que exige pasar la CI.
 - Estrategia de ramas: GitHub Flow. `main` es la única rama permanente. Cada cambio se hace en una rama corta creada desde `main`, que se integra con squash merge y se borra al integrarse. El título del PR queda como mensaje del commit en `main`, por lo que también sigue Conventional Commits.
 - Nombres de rama: `tipo/descripcion-corta`, en inglés y en minúsculas con guiones, con los tipos de Conventional Commits (`feat/`, `fix/`, `docs/`, `refactor/`, `test/`, `ci/`, `chore/`). `spike/` se usa para experimentos que pueden descartarse sin integrarse.
 - Versiones: tags SemVer anotados (`vX.Y.Z`) sobre `main`, en `0.x` mientras la API no sea estable. Una rama `release/X.Y` se crea solo si hay que corregir una versión anterior sin incluir lo nuevo de `main`.
@@ -342,10 +345,12 @@ Descartados: `bacon` (redundante con RustRover) y `cargo-audit` (cubierto por `c
 
 **D-32 CI.**
 
-| Etapa | Cada push | PR hacia `main` |
-|---|---|---|
-| Repositorio privado (fase 1) | Linux: revisiones en un solo job y tests | Linux y Windows; cobertura en Linux; tests de integración con el Moodle de pruebas |
-| Repositorio público (fase 2) | Linux y Windows | Igual que en la fase 1 |
+| Evento | Ejecución |
+|---|---|
+| Cada push | Revisiones y tests en Linux y Windows |
+| PR hacia `main` | Además: cobertura en Linux y tests de integración con el Moodle de pruebas |
+
+- Los minutos de GitHub Actions no tienen costo en repositorios públicos, así que ya no se limita Windows a los PR, como se planeaba mientras el repositorio fuera privado.
 
 - Caché de compilación, cancelación de ejecuciones obsoletas y exclusión de los cambios que solo afectan a `docs/`.
 - Las compilaciones completas de la app (instaladores) corren solo en los PR hacia `main` o al crear una versión.
@@ -385,7 +390,7 @@ El identificador de la app (P-12) debe definirse antes de publicar: cambiarlo de
 | `.gitignore` estricto desde el primer commit: bases de datos locales, cachés, `.env`, credenciales, respuestas guardadas de la API (incluida `.idea/httpRequests/`), `http-client.private.env.json` y descargas | Decidido |
 | Escáner de secretos (`betterleaks`) como hook previo al commit, ejecutado por prek con versión fijada, y en la CI | Decidido |
 | Regla propia de Betterleaks para detectar valores de `wstoken` y `privatetoken` | Decidido |
-| Revisión del historial completo con el escáner antes de hacer público el repositorio, incluidas las fixtures de los tests | Propuesto |
+| Revisión del historial completo con un escáner de secretos al hacer público el repositorio: realizada el 2026-11-12 con gitleaks (reglas por defecto y una regla para `wstoken` y `privatetoken`), incluidas las ramas de los PR, sin hallazgos. Las fixtures de los tests quedan cubiertas por Betterleaks en el hook y en la CI | Decidido |
 
 ### 7.2 Seguridad de la aplicación
 
