@@ -1,0 +1,53 @@
+# Hooks de Git, ejecutados por prek (D-29). Se activan una vez por copia del repositorio con:
+#   prek install
+# Dependabot actualiza el rev de los repositorios remotos (D-30).
+#
+# | Momento    | Revisión                |
+# |------------|-------------------------|
+# | pre-commit | Betterleaks y rustfmt   |
+# | commit-msg | Conventional Commits    |
+# | pre-push   | clippy y tests          |
+
+default_install_hook_types: [pre-commit, commit-msg, pre-push]
+default_stages: [pre-commit]
+minimum_prek_version: "0.5.10"
+
+repos:
+  # Secretos en los cambios preparados para el commit (lineamiento 7.1)
+  - repo: https://github.com/betterleaks/betterleaks
+    rev: v1.10.0
+    hooks:
+      - id: betterleaks
+        args: [--config, .betterleaks.toml]
+
+  # Conventional Commits; la configuración está en committed.toml
+  - repo: https://github.com/crate-ci/committed
+    rev: v1.1.12
+    hooks:
+      - id: committed-src
+
+  # Revisiones de Rust: usan las mismas tareas de just que la CI
+  - repo: local
+    hooks:
+      - id: rustfmt
+        name: rustfmt
+        entry: just fmt-check
+        language: system
+        types: [rust]
+        pass_filenames: false
+
+      - id: clippy
+        name: clippy
+        entry: just clippy
+        language: system
+        files: ^(.*\.rs|(.*/)?Cargo\.(toml|lock)|rust-toolchain\.toml)$
+        pass_filenames: false
+        stages: [pre-push]
+
+      - id: tests
+        name: tests
+        entry: just test
+        language: system
+        files: ^(.*\.rs|(.*/)?Cargo\.(toml|lock)|rust-toolchain\.toml)$
+        pass_filenames: false
+        stages: [pre-push]

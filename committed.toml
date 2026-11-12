@@ -1,0 +1,7 @@
+# Validación de Conventional Commits con committed, en el hook commit-msg (D-30).
+style = "conventional"
+# Tipos de la guía de contribución (CONTRIBUTING.md)
+allowed_types = ["feat", "fix", "docs", "refactor", "test", "ci", "chore"]
+subject_length = 72
+# No exige mayúscula inicial: "feat: add login"
+subject_capitalized = false

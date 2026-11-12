@@ -1,0 +1,131 @@
+name: Rust
+
+on:
+  pull_request:
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: rust-${{ github.ref }}
+  cancel-in-progress: ${{ github.event_name == 'pull_request' }}
+
+env:
+  CARGO_TERM_COLOR: always
+
+jobs:
+  # Secretos en todo el historial (lineamiento 7.1). Corre en cualquier cambio,
+  # también en los que solo afectan a la documentación.
+  secrets:
+    name: secrets
+    runs-on: ubuntu-24.04
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          fetch-depth: 0
+          persist-credentials: false
+
+      - name: Install Betterleaks
+        env:
+          GH_TOKEN: ${{ github.token }}
+          # Misma versión que el hook de .pre-commit-config.yaml
+          BETTERLEAKS_VERSION: "1.10.0"
+        run: |
+          dir="$RUNNER_TEMP/betterleaks"
+          archive="betterleaks_${BETTERLEAKS_VERSION}_linux_x64.tar.gz"
+          gh release download "v${BETTERLEAKS_VERSION}" -R betterleaks/betterleaks \
+            -p "$archive" -p checksums.txt -D "$dir"
+          cd "$dir"
+          sha256sum --check --ignore-missing checksums.txt
+          tar -xzf "$archive" betterleaks
+          echo "$dir" >> "$GITHUB_PATH"
+
+      - name: Scan history
+        run: betterleaks git --config .betterleaks.toml --redact --verbose .
+
+  # Decide si el cambio afecta a Rust. Los PR que solo cambian documentación
+  # saltan las revisiones de Rust (D-32); un job saltado cuenta como aprobado
+  # en la regla de main.
+  changes:
+    name: changes
+    runs-on: ubuntu-24.04
+    timeout-minutes: 5
+    outputs:
+      rust: ${{ steps.filter.outputs.rust }}
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          fetch-depth: 2
+          persist-credentials: false
+
+      - id: filter
+        name: Detect Rust changes
+        run: |
+          if [ "$GITHUB_EVENT_NAME" != "pull_request" ]; then
+            echo "rust=true" >> "$GITHUB_OUTPUT"
+            exit 0
+          fi
+          # En un PR, HEAD es el merge con main y HEAD^1 es main
+          docs_only='^(docs/|arquitectura/|tools/docs/|dev/structurizr/)|\.md$|^zensical\.toml$'
+          if git diff --name-only HEAD^1 HEAD | grep -qvE "$docs_only"; then
+            echo "rust=true" >> "$GITHUB_OUTPUT"
+          else
+            echo "rust=false" >> "$GITHUB_OUTPUT"
+          fi
+
+  # Revisiones y tests en Linux y Windows (D-32)
+  check:
+    name: check (${{ matrix.os }})
+    needs: changes
+    if: needs.changes.outputs.rust == 'true'
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [ubuntu-24.04, windows-2025]
+    runs-on: ${{ matrix.os }}
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+
+      # Instala la versión y los componentes de rust-toolchain.toml
+      - name: Install Rust
+        run: rustup toolchain install
+
+      - uses: Swatinem/rust-cache@d1527c8f67ef9af357290475d4af4b0fab8f12e0 # v2.9.3
+
+      - uses: taiki-e/install-action@cfdb7ed4ccc7c7dce37759eae89dc5674b469b39 # v2.90.3
+        with:
+          tool: just@1.59.0,cargo-deny@0.20.2,cargo-nextest@0.9.151,cargo-machete@0.9.2
+
+      - run: just check
+      - run: just machete
+      - run: just test
+
+  # Cobertura en Linux, solo en los PR (D-32). Umbral y publicación: P-15.
+  coverage:
+    name: coverage
+    needs: changes
+    if: github.event_name == 'pull_request' && needs.changes.outputs.rust == 'true'
+    runs-on: ubuntu-24.04
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+
+      - name: Install Rust
+        run: rustup toolchain install
+
+      - uses: Swatinem/rust-cache@d1527c8f67ef9af357290475d4af4b0fab8f12e0 # v2.9.3
+
+      - uses: taiki-e/install-action@cfdb7ed4ccc7c7dce37759eae89dc5674b469b39 # v2.90.3
+        with:
+          tool: just@1.59.0,cargo-nextest@0.9.151,cargo-llvm-cov@0.9.1
+
+      - run: just coverage

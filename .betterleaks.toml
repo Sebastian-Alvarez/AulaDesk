@@ -1,0 +1,16 @@
+# Configuración de Betterleaks (lineamiento 7.1).
+# Usa las reglas por defecto de la versión fijada en .pre-commit-config.yaml
+# y agrega una regla para los tokens de Moodle.
+# Betterleaks no carga este archivo solo: se pasa con --config en el hook y en la CI.
+
+[extend]
+useDefault = true
+
+# Token de servicio web (wstoken, 32 caracteres hexadecimales) y privatetoken
+# (64 caracteres alfanuméricos), en URL, JSON, YAML o variables como MOODLE_TOKEN.
+[[rules]]
+id = "moodle-token"
+description = "Moodle web service token (wstoken) or privatetoken"
+regex = '''(?i)(?:wstoken|privatetoken|token)\b["']?\s*[:=]\s*["']?([0-9a-z]{64}|[0-9a-f]{32})\b'''
+secretGroup = 1
+keywords = ["token"]
