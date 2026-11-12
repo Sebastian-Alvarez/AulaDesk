@@ -4,7 +4,9 @@ AulaDesk está en la etapa de análisis y diseño inicial. Esta guía describe c
 
 ## Reportar un problema
 
-Antes de abrir un issue, revisa si ya existe uno sobre lo mismo. Incluye:
+Antes de abrir un [issue](https://github.com/Sebastian-Alvarez/AulaDesk/issues), revisa si ya existe uno sobre lo mismo.
+
+Incluye:
 
 - Versión o commit de AulaDesk y sistema operativo (Windows o Linux, con su versión).
 - Instancia de Moodle y su versión, si la conoces.
@@ -13,7 +15,7 @@ Antes de abrir un issue, revisa si ya existe uno sobre lo mismo. Incluye:
 
 **Nunca incluyas tokens, `privatetoken`, cookies, contraseñas ni capturas con datos de tu sesión.** Revisa los logs antes de pegarlos.
 
-Si encuentras una vulnerabilidad, no abras un issue público: repórtala en privado desde la pestaña **Security** del repositorio (**Report a vulnerability**).
+Si encuentras una vulnerabilidad, no abras un issue público: sigue la [política de seguridad](SECURITY.md).
 
 ## Requisitos
 
@@ -31,7 +33,9 @@ gh repo fork Sebastian-Alvarez/AulaDesk --clone
 cd AulaDesk
 ```
 
-`gh repo fork --clone` deja tu fork como `origin` y el repositorio original como `upstream`. Sin `gh`, haz el fork desde GitHub, clónalo y agrega el remoto a mano:
+`gh repo fork --clone` deja tu fork como `origin` y el repositorio original como `upstream`.
+
+Sin `gh`, haz el fork desde GitHub, clónalo y agrega el remoto a mano:
 
 ```sh
 git remote add upstream https://github.com/Sebastian-Alvarez/AulaDesk.git
@@ -96,6 +100,15 @@ Un PR tiene más probabilidades de aceptarse si:
 
 ### 4. Subir la rama y abrir el PR
 
+Antes, trae lo último de `main` a tu rama (si no avanzó, no cambia nada):
+
+```sh
+git fetch upstream
+git rebase upstream/main
+```
+
+Luego sube la rama y abre el PR:
+
 ```sh
 git push -u origin feat/course-sync
 gh pr create --fill
@@ -103,21 +116,12 @@ gh pr create --fill
 
 - El título del PR debe seguir Conventional Commits, porque se convierte en el mensaje del commit en `main`.
 - Si el cambio no está terminado, ábrelo como borrador (`gh pr create --draft`) para que la CI corra desde el principio.
-- Subir la rama también sirve para continuar el trabajo desde otro computador.
+- Subir la rama también sirve para continuar el trabajo desde otro computador. Allá, antes de seguir, trae lo último con `git pull` en la rama.
+- Si ya habías subido la rama antes del `rebase`, súbela con `git push --force-with-lease`.
+- Si `main` avanza después de abrir el PR, la regla de `main` exige actualizar la rama antes de integrar: repite el `rebase` y súbela con `git push --force-with-lease`, o usa el botón **Update branch** del PR.
 
-### 5. Mantener la rama al día
 
-Si `main` avanzó mientras trabajabas:
-
-```sh
-git fetch upstream
-git rebase upstream/main
-git push --force-with-lease
-```
-
-También se puede usar el botón **Update branch** del PR.
-
-### 6. Integrar
+### 5. Integrar
 
 Cuando la CI está en verde, el PR se integra con **Squash and merge**. La rama remota se borra automáticamente; la local se borra con:
 
