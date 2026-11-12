@@ -1,0 +1,11 @@
+[package]
+name = "auladesk-core"
+description = "Core library of AulaDesk: Moodle API client, sync, storage and rules"
+version.workspace = true
+edition.workspace = true
+rust-version.workspace = true
+license.workspace = true
+repository.workspace = true
+publish.workspace = true
+
+[dependencies]
