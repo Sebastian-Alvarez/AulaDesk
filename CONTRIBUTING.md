@@ -21,8 +21,13 @@ Si encuentras una vulnerabilidad, no abras un issue público: sigue la [polític
 
 - [Git](https://git-scm.com/) y, opcionalmente, [GitHub CLI](https://cli.github.com/) (`gh`)
 - [`just`](https://just.systems/), el punto de entrada de todas las tareas (`just` sin argumentos las lista)
+- [rustup](https://rustup.rs/). La versión de Rust está fijada en `rust-toolchain.toml` y se instala sola al compilar por primera vez.
+- [prek](https://prek.j178.dev/), que ejecuta los hooks de Git
+- Herramientas de cargo: [`cargo-deny`](https://github.com/EmbarkStudios/cargo-deny), [`cargo-nextest`](https://nexte.st/), [`cargo-llvm-cov`](https://github.com/taiki-e/cargo-llvm-cov) y [`cargo-machete`](https://github.com/bnjbvr/cargo-machete)
 - [`uv`](https://docs.astral.sh/uv/), para construir la documentación
 - [Docker](https://docs.docker.com/get-started/get-docker/), para los diagramas C4
+
+Las versiones que usa la CI están en [`.github/workflows/rust.yml`](.github/workflows/rust.yml).
 
 ## Obtener el código
 
@@ -42,6 +47,20 @@ git remote add upstream https://github.com/Sebastian-Alvarez/AulaDesk.git
 ```
 
 Si tienes permiso de escritura en el repositorio, clónalo directamente y usa `origin` donde esta guía dice `upstream`.
+
+Después de clonar, activa los hooks de Git:
+
+```sh
+prek install
+```
+
+| Momento | Revisión |
+|---|---|
+| Commit | Secretos con Betterleaks y formato con `rustfmt` |
+| Mensaje del commit | Conventional Commits, con `committed` |
+| Push | `clippy` y tests |
+
+La primera ejecución tarda unos minutos, porque prek compila Betterleaks y `committed`.
 
 ## Flujo de trabajo
 
@@ -84,11 +103,11 @@ Los commits dentro de la rama pueden ser pequeños o provisionales: al integrar 
 ### 3. Revisar antes del PR
 
 ```sh
+just check            # formato, clippy y cargo-deny
+just test             # tests
 just docs-build       # el sitio se construye sin advertencias
 just diagrams-check   # el modelo C4 es válido (si cambiaste arquitectura/)
 ```
-
-Cuando exista el código de Rust, también `just check` y `just test`.
 
 Un PR tiene más probabilidades de aceptarse si:
 
