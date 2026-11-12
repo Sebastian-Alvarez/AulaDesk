@@ -2,7 +2,7 @@
 title: AulaDesk - Registro de decisiones
 project: AulaDesk (nombre temporal)
 stage: Análisis y diseño inicial
-updated: 2026-11-10
+updated: 2026-11-11
 ---
 
 # AulaDesk - Registro de decisiones
@@ -12,7 +12,7 @@ AulaDesk es un nombre temporal. El nombre definitivo no puede incluir "Moodle", 
 | Campo | Valor |
 |---|---|
 | Etapa | Análisis y diseño inicial |
-| Última actualización | 2026-11-10 |
+| Última actualización | 2026-11-11 |
 | Estados usados | Decidido, Pospuesto, Pendiente, Propuesto |
 
 ## Contenido
@@ -135,7 +135,7 @@ Alcance confirmado por la [validación de la fase 1](validacion/fase-1.md):
 | D-27 | Entorno de desarrollo | Windows con RustRover; Linux en dual boot para validar | Decidido |
 | D-28 | Herramientas de calidad | rustfmt, clippy, cargo-deny, cargo-nextest, cargo-llvm-cov, cargo-machete, mockito e insta | Decidido |
 | D-29 | Hooks y tareas | prek con `.pre-commit-config.yaml`; tareas con `just` | Decidido |
-| D-30 | Flujo de Git | Conventional Commits, PR con regla en `main` y Dependabot | Decidido |
+| D-30 | Flujo de Git | GitHub Flow con ramas cortas, Conventional Commits, PR con regla en `main` y Dependabot | Decidido |
 | D-31 | Moodle de pruebas | Instancia local en Docker, definida en el repositorio | Decidido |
 | D-32 | CI | Linux en cada push y Windows en los PR mientras el repositorio sea privado | Decidido |
 
@@ -325,8 +325,13 @@ Descartados: `bacon` (redundante con RustRover) y `cargo-audit` (cubierto por `c
 
 - Mensajes con Conventional Commits, validados por el hook `commit-msg`.
 - Los cambios llegan a `main` mediante PR, con una regla que exige pasar la CI. En un repositorio privado requiere GitHub Pro, incluido en el GitHub Student Developer Pack.
+- Estrategia de ramas: GitHub Flow. `main` es la única rama permanente. Cada cambio se hace en una rama corta creada desde `main`, que se integra con squash merge y se borra al integrarse. El título del PR queda como mensaje del commit en `main`, por lo que también sigue Conventional Commits.
+- Nombres de rama: `tipo/descripcion-corta`, en inglés y en minúsculas con guiones, con los tipos de Conventional Commits (`feat/`, `fix/`, `docs/`, `refactor/`, `test/`, `ci/`, `chore/`). `spike/` se usa para experimentos que pueden descartarse sin integrarse.
+- Versiones: tags SemVer anotados (`vX.Y.Z`) sobre `main`, en `0.x` mientras la API no sea estable. Una rama `release/X.Y` se crea solo si hay que corregir una versión anterior sin incluir lo nuevo de `main`.
+- Descartado: Git Flow (rama `develop` y ramas de release y hotfix permanentes). Sirve para mantener varias versiones publicadas a la vez; con un solo desarrollador agrega pasos sin beneficio.
 - Dependabot actualiza crates, GitHub Actions, hooks y la versión de Rust.
 - `Cargo.lock` se versiona.
+- Los pasos para trabajar con este flujo están en [`CONTRIBUTING.md`](https://github.com/Sebastian-Alvarez/AulaDesk/blob/main/CONTRIBUTING.md).
 
 **D-31 Moodle de pruebas.**
 

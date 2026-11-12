@@ -25,6 +25,10 @@ just docs-serve   # vista previa en http://localhost:8000
 just docs-build   # construye el sitio en site/
 ```
 
+## Contribuir
+
+Cómo reportar problemas y el flujo de trabajo con Git están en [`CONTRIBUTING.md`](CONTRIBUTING.md).
+
 ## Licencia
 
 Distribuido bajo la licencia [Apache 2.0](LICENSE).
