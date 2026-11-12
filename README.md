@@ -1,6 +1,6 @@
 # AulaDesk
 
-> **Proyecto en desarrollo.** Todavía no hay una versión utilizable. AulaDesk es un nombre temporal.
+> **Proyecto en desarrollo.** Todavía no hay una versión utilizable.
 
 Cliente de escritorio para Moodle con login persistente, notificaciones, descargas automáticas e integración con calendarios.
 
@@ -10,15 +10,17 @@ En muchas instancias de Moodle hay que iniciar sesión todos los días desde el 
 
 ## Estado
 
-Etapa de análisis y diseño inicial. La documentación del proyecto está en [`docs/`](docs/):
+Etapa de análisis y diseño inicial. La documentación está publicada en [sebastian-alvarez.github.io/AulaDesk](https://sebastian-alvarez.github.io/AulaDesk/), y su fuente está en [`docs/`](docs/):
 
 - [Registro de decisiones](docs/registro-de-decisiones.md)
 - [ADR](docs/adr/index.md)
+- [Diagramas de arquitectura (C4)](https://sebastian-alvarez.github.io/AulaDesk/arquitectura/)
 - [Validación de la fase 1](docs/validacion/fase-1.md)
 
 ## Documentación local
 
-La documentación se publica con [Zensical](https://zensical.org/). Para verla en local se necesitan [`just`](https://just.systems/) y [`uv`](https://docs.astral.sh/uv/):
+La documentación se publica con [Zensical](https://zensical.org/) en [sebastian-alvarez.github.io/AulaDesk](https://sebastian-alvarez.github.io/AulaDesk/) al integrar cada cambio en `main`.
+Para revisarla en local antes de publicar se necesitan [`just`](https://just.systems/) y [`uv`](https://docs.astral.sh/uv/):
 
 ```sh
 just docs-serve   # vista previa en http://localhost:8000
@@ -27,7 +29,7 @@ just docs-build   # construye el sitio en site/
 
 ## Contribuir
 
-Cómo reportar problemas y el flujo de trabajo con Git están en [`CONTRIBUTING.md`](CONTRIBUTING.md).
+Cómo reportar problemas y el flujo de trabajo con Git están en [`CONTRIBUTING.md`](CONTRIBUTING.md). Las vulnerabilidades se reportan en privado, según la [política de seguridad](SECURITY.md).
 
 ## Licencia
 
