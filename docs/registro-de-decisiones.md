@@ -342,6 +342,8 @@ Descartados: `bacon` (redundante con RustRover) y `cargo-audit` (cubierto por `c
 - Configuración y datos de ejemplo automáticos: servicios web y servicio móvil, un usuario estudiante de prueba, cursos, calificaciones, tareas y eventos.
 - El código de Moodle (GPL) se descarga al iniciar, con un tag fijo, y no se incluye en el repositorio (D-20).
 - Se usa para el desarrollo diario, el HTTP Client y los tests de integración. La USM real se usa solo para validar lo que no se reproduce localmente (SSO y MFA, gateway, autologin, CSP), mediante la CLI o `validate_usm.py`.
+- Implementación: Moodle 4.5.15 (tag verificado por su commit), imagen `moodlehq/moodle-php-apache` con PHP 8.3 y PostgreSQL 16, en `http://localhost:8090`. Login por navegador embebido y zona horaria `America/Santiago`, como la USM. El token de prueba se obtiene con `just moodle-token`.
+- Versiones fijas y fuera de Dependabot (excepción a D-30): el entorno de pruebas debe reproducir el comportamiento de las aulas donde se usará AulaDesk (hoy la USM; más adelante, otras como la PUCV o la UV). Moodle, PHP y PostgreSQL se actualizan a mano, solo cuando cambian esas instancias o cuando una imagen deja de estar disponible.
 
 **D-32 CI.**
 

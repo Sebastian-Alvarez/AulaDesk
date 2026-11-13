@@ -37,6 +37,8 @@ just check     # formato, clippy y cargo-deny
 just test      # tests
 ```
 
+Para probar contra la API hay un Moodle de pruebas local en Docker (`just moodle-up`); los detalles están en [`CONTRIBUTING.md`](CONTRIBUTING.md#moodle-de-pruebas).
+
 ## Contribuir
 
 Cómo reportar problemas y el flujo de trabajo con Git están en [`CONTRIBUTING.md`](CONTRIBUTING.md). Las vulnerabilidades se reportan en privado, según la [política de seguridad](SECURITY.md).
