@@ -33,6 +33,17 @@ set_config('typeoflogin', \tool_mobile\api::LOGIN_VIA_EMBEDDED_BROWSER, 'tool_mo
 // Zona horaria de la USM, para que los plazos se vean como en el aula.
 set_config('timezone', 'America/Santiago');
 
+// Portada: sin sesión iniciada, solo un mensaje de bienvenida, sin la lista de cursos.
+set_config('frontpage', 'none');
+course_create_sections_if_missing(SITEID, [1]);
+$welcome = $DB->get_record('course_sections', ['course' => SITEID, 'section' => 1], '*', MUST_EXIST);
+course_update_section(get_site(), $welcome, [
+    'summary' => '<h3>Moodle de pruebas de AulaDesk</h3>'
+        . '<p>Instancia local para desarrollar y probar AulaDesk. Inicia sesión con el usuario de prueba '
+        . 'indicado en <code>CONTRIBUTING.md</code>.</p>',
+    'summaryformat' => FORMAT_HTML,
+]);
+
 $generator = new testing_data_generator();
 $day = DAYSECS;
 $now = time();
@@ -58,6 +69,7 @@ $student = $generator->create_user([
 $hist = $generator->create_course([
     'fullname' => 'Historia Antigua',
     'shortname' => 'HIS204',
+    'summary' => '<p>Ramo de prueba: Roma y Grecia.</p>',
     'numsections' => 3,
 ]);
 $generator->enrol_user($student->id, $hist->id, 'student');
@@ -91,6 +103,7 @@ $generator->create_grade_grade(['itemid' => $item->id, 'userid' => $student->id,
 $calc = $generator->create_course([
     'fullname' => 'Cálculo I',
     'shortname' => 'MAT021',
+    'summary' => '<p>Ramo de prueba: límites y derivadas.</p>',
     'numsections' => 2,
 ]);
 $generator->enrol_user($student->id, $calc->id, 'student');
