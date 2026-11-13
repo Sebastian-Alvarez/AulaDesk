@@ -12,6 +12,9 @@ structurizr := "docker compose -f dev/structurizr/compose.yaml"
 # En Linux, el contenedor corre con el uid y gid de quien lo ejecuta (ver compose.yaml)
 export STRUCTURIZR_USER := if os_family() == "unix" { `id -u` + ":" + `id -g` } else { "" }
 
+# Moodle de pruebas en Docker, definido en dev/moodle/compose.yaml (D-31)
+moodle := "docker compose -f dev/moodle/compose.yaml"
+
 # Muestra las tareas disponibles
 default:
     @just --list
@@ -49,6 +52,28 @@ test:
 # Cobertura de los tests; resumen en la terminal (umbral y publicación: P-15)
 coverage:
     cargo llvm-cov nextest --workspace --all-features --locked --no-tests=warn
+
+# --- Moodle de pruebas (D-31) ---
+
+# Levanta el Moodle de pruebas en http://localhost:8090; la primera vez lo descarga e instala
+moodle-up:
+    {{ moodle }} up -d --wait --wait-timeout 900
+
+# Detiene el Moodle de pruebas y conserva sus datos
+moodle-down:
+    {{ moodle }} down
+
+# Borra el Moodle de pruebas con sus datos; el próximo moodle-up lo instala de nuevo
+moodle-reset:
+    {{ moodle }} down --volumes
+
+# Muestra el token del estudiante de prueba para el servicio móvil
+moodle-token:
+    {{ moodle }} exec -u www-data moodle php /setup/token.php
+
+# Muestra los registros de la instalación y del servidor
+moodle-logs:
+    {{ moodle }} logs setup moodle
 
 # --- Documentación (D-23, D-26) ---
 
