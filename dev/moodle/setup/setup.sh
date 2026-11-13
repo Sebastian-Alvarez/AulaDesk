@@ -11,16 +11,24 @@ installed="$moodledata/.auladesk-installed"
 as_www() { runuser -u www-data -- "$@"; }
 
 # 1. Código de Moodle, con un tag fijo y verificado por su commit. No se incluye en el repositorio (D-20).
+# Se clona en una carpeta temporal y solo se copia al volumen si el commit coincide, para que
+# nunca quede código sin verificar. (Clonar directo en el volumen falla: Git rechaza la carpeta
+# por pertenecer a www-data y no a root.)
 if [ ! -f "$MOODLE_DIR/version.php" ]; then
     echo "Descargando Moodle $MOODLE_TAG..."
-    git -c advice.detachedHead=false clone --quiet --depth 1 --branch "$MOODLE_TAG" https://github.com/moodle/moodle.git "$MOODLE_DIR"
-    commit=$(git -C "$MOODLE_DIR" rev-parse HEAD)
+    tmp=$(mktemp -d)
+    git -c advice.detachedHead=false clone --quiet --depth 1 --branch "$MOODLE_TAG" \
+        https://github.com/moodle/moodle.git "$tmp/moodle"
+    commit=$(git -C "$tmp/moodle" rev-parse HEAD)
     if [ "$commit" != "$MOODLE_COMMIT" ]; then
         echo "El tag $MOODLE_TAG apunta a $commit y se esperaba $MOODLE_COMMIT." >&2
-        find "$MOODLE_DIR" -mindepth 1 -delete
+        rm -rf "$tmp"
         exit 1
     fi
-    rm -rf "$MOODLE_DIR/.git"
+    rm -rf "$tmp/moodle/.git"
+    find "$MOODLE_DIR" -mindepth 1 -delete
+    cp -a "$tmp/moodle/." "$MOODLE_DIR/"
+    rm -rf "$tmp"
 fi
 
 cp /setup/config.php "$MOODLE_DIR/config.php"
