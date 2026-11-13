@@ -14,3 +14,13 @@ description = "Moodle web service token (wstoken) or privatetoken"
 regex = '''(?i)(?:wstoken|privatetoken|token)\b["']?\s*[:=]\s*["']?([0-9a-z]{64}|[0-9a-f]{32})\b'''
 secretGroup = 1
 keywords = ["token"]
+
+# Contraseñas de prueba del Moodle local (D-31). Son públicas a propósito, están documentadas
+# en CONTRIBUTING.md y solo sirven en 127.0.0.1. La excepción exige el archivo y el valor exactos.
+[[allowlists]]
+description = "Credenciales de prueba del Moodle local"
+targetRules = ["generic-password"]
+condition = "AND"
+paths = ['''^dev/moodle/compose\.yaml$''']
+regexTarget = "match"
+regexes = ['''PASSWORD: (moodle|Admin-1234!|Estudiante-1234)$''']
