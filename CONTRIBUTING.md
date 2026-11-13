@@ -25,7 +25,7 @@ Si encuentras una vulnerabilidad, no abras un issue público: sigue la [polític
 - [prek](https://prek.j178.dev/), que ejecuta los hooks de Git
 - Herramientas de cargo: [`cargo-deny`](https://github.com/EmbarkStudios/cargo-deny), [`cargo-nextest`](https://nexte.st/), [`cargo-llvm-cov`](https://github.com/taiki-e/cargo-llvm-cov) y [`cargo-machete`](https://github.com/bnjbvr/cargo-machete)
 - [`uv`](https://docs.astral.sh/uv/), para construir la documentación
-- [Docker](https://docs.docker.com/get-started/get-docker/), para los diagramas C4
+- [Docker](https://docs.docker.com/get-started/get-docker/), para los diagramas C4 y el Moodle de pruebas
 
 Las versiones que usa la CI están en [`.github/workflows/rust.yml`](.github/workflows/rust.yml).
 
@@ -61,6 +61,24 @@ prek install
 | Push | `clippy` y tests |
 
 La primera ejecución tarda unos minutos, porque prek compila Betterleaks y `committed`.
+
+## Moodle de pruebas
+
+Para desarrollar y probar contra la API sin usar una cuenta real, el repositorio incluye un Moodle 4.5 local en Docker ([`dev/moodle/`](dev/moodle/compose.yaml)). La primera vez descarga Moodle, lo instala y crea los datos de ejemplo; tarda unos minutos.
+
+```sh
+just moodle-up      # levanta el Moodle en http://localhost:8090
+just moodle-token   # muestra el token del estudiante de prueba
+just moodle-down    # lo detiene y conserva los datos
+just moodle-reset   # lo borra; el próximo moodle-up lo instala de nuevo
+```
+
+| Usuario | Contraseña | Uso |
+|---|---|---|
+| `estudiante` | `Estudiante-1234` | Estudiante inscrito en HIS204 y MAT021, con notas, tareas y eventos |
+| `admin` | `Admin-1234!` | Administración del sitio |
+
+Son credenciales de prueba, solo para este Moodle local. Nunca uses aquí, ni guardes en archivos, el token o la contraseña de una cuenta real.
 
 ## Flujo de trabajo
 

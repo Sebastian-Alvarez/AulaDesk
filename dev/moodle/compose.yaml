@@ -1,0 +1,72 @@
+# Moodle de pruebas para el desarrollo (D-31). Se usa desde el justfile:
+#   moodle-up, moodle-down, moodle-reset, moodle-token y moodle-logs.
+# Solo para uso local: las contraseñas son de prueba y el sitio escucha solo en 127.0.0.1.
+#
+# Versiones fijas a propósito, fuera de Dependabot: el entorno debe reproducir las aulas
+# donde se usará AulaDesk (hoy la USM). Moodle, PHP y PostgreSQL se actualizan a mano,
+# solo cuando cambian esas instancias o cuando una imagen deja de estar disponible.
+name: auladesk-moodle
+
+x-moodle: &moodle
+  # Imagen oficial de Moodle HQ con PHP 8.3, compatible con Moodle 4.5
+  image: moodlehq/moodle-php-apache:8.3-bookworm@sha256:1db7b6ed013fcb5268095b5e28c410ba9117d38d9b6a324c100c48fcbe69745e
+  environment: &moodle-env
+    MOODLE_DIR: /var/www/html
+    MOODLE_WWWROOT: http://localhost:8090
+    MOODLE_DB_HOST: db
+    MOODLE_DB_NAME: moodle
+    MOODLE_DB_USER: moodle
+    MOODLE_DB_PASSWORD: moodle
+    MOODLE_STUDENT_USERNAME: estudiante
+  volumes:
+    - code:/var/www/html
+    - moodledata:/var/www/moodledata
+    - ./setup:/setup:ro
+
+services:
+  db:
+    image: postgres:16.15-alpine
+    environment:
+      POSTGRES_DB: moodle
+      POSTGRES_USER: moodle
+      POSTGRES_PASSWORD: moodle
+    volumes:
+      - db:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD", "pg_isready", "-U", "moodle", "-d", "moodle"]
+      interval: 5s
+      timeout: 5s
+      retries: 20
+
+  # Descarga, instala y carga los datos de ejemplo; termina cuando Moodle está listo.
+  setup:
+    <<: *moodle
+    entrypoint: ["bash", "/setup/setup.sh"]
+    environment:
+      <<: *moodle-env
+      # Misma versión que la USM (validación de la fase 1). El commit verifica el código descargado.
+      MOODLE_TAG: v4.5.15
+      MOODLE_COMMIT: 215f44380bdc3ccf852a3a22e34f8423ff64033a
+      MOODLE_ADMIN_PASSWORD: Admin-1234!
+      MOODLE_STUDENT_PASSWORD: Estudiante-1234
+    depends_on:
+      db:
+        condition: service_healthy
+
+  moodle:
+    <<: *moodle
+    ports:
+      - "127.0.0.1:8090:80"
+    depends_on:
+      setup:
+        condition: service_completed_successfully
+    healthcheck:
+      test: ["CMD", "curl", "-fsS", "-o", "/dev/null", "http://localhost/login/index.php"]
+      interval: 10s
+      timeout: 5s
+      retries: 30
+
+volumes:
+  code:
+  moodledata:
+  db:
