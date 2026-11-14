@@ -116,7 +116,7 @@ Alcance confirmado por la [validación de la fase 1](validacion/fase-1.md):
 | D-08 | Tecnología | Rust + Tauri 2 | Decidido |
 | D-09 | Interfaz | React + TypeScript | Decidido |
 | D-10 | Repositorio | Workspace de Cargo y CI con GitHub Actions | Decidido |
-| D-11 | Idioma del repositorio | Código y commits en inglés; documentación en español | Decidido |
+| D-11 | Idioma del repositorio | Código, commits y títulos de PR en inglés; documentación y descripciones de PR en español | Decidido |
 | D-12 | Datos | SQLite, incluyendo la respuesta cruda de Moodle | Decidido |
 | D-13 | Login | Navegador externo, deep link y validación del passport | Decidido |
 | D-14 | Sesión | Token persistente, validado antes de usarse | Decidido |
@@ -220,7 +220,7 @@ auladesk/
 
 Integración continua con GitHub Actions: compilación y pruebas en Windows y Linux.
 
-**D-11 Idioma del repositorio.** Código, comentarios y commits en inglés, que es el estándar de la industria. Documentación (README, ADR, diagramas) en español.
+**D-11 Idioma del repositorio.** Código, comentarios, commits, nombres de rama y títulos de PR en inglés, que es el estándar de la industria; el título del PR se convierte en el commit de `main` (D-30). Documentación (README, ADR, diagramas) y descripciones de PR en español.
 
 ### 5.4 Datos
 
