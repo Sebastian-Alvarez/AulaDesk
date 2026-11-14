@@ -7,8 +7,7 @@ site_description = "Documentación de AulaDesk, cliente de escritorio para Moodl
 site_url = "https://sebastian-alvarez.github.io/AulaDesk/"
 repo_url = "https://github.com/Sebastian-Alvarez/AulaDesk"
 repo_name = "AulaDesk"
-copyright = "AulaDesk · Licencia Apache 2.0 · Proyecto independiente, sin afiliación con Moodle Pty Ltd"
-
+copyright = "AulaDesk · Licencia Apache 2.0 · Proyecto independiente, sin afiliación con Moodle Pty Ltd ni con las instituciones mencionadas"
 nav = [
   { "Inicio" = "index.md" },
   { "Registro de decisiones" = "registro-de-decisiones.md" },
