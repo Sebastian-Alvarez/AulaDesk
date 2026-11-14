@@ -408,8 +408,8 @@ El identificador de la app (P-12) debe definirse antes de publicar: cambiarlo de
 ### 7.3 Marca
 
 - No usar "Moodle" en el nombre de la app, el dominio ni la publicidad.
-- No usar los logos de Moodle, Tauri ni la USM.
-- Incluir en el README un aviso de no afiliación con Moodle Pty Ltd (Propuesto).
+- No usar los logos de Moodle, Tauri ni de las instituciones donde se use.
+- Aviso de no afiliación con Moodle Pty Ltd ni con las instituciones mencionadas, en el README y en el pie del sitio de documentación (Decidido).
 
 ---
 

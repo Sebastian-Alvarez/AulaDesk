@@ -49,4 +49,4 @@ Distribuido bajo la licencia [Apache 2.0](LICENSE).
 
 ## Aviso
 
-AulaDesk es un proyecto independiente. No está afiliado, asociado ni respaldado por Moodle Pty Ltd ni por ninguna institución educativa. Moodle™ es una marca registrada de Moodle Pty Ltd.
+AulaDesk es un proyecto independiente. No está afiliado, patrocinado ni respaldado por Moodle Pty Ltd ni por las instituciones cuyas aulas virtuales se mencionan en este repositorio; esos nombres se usan solo para indicar dónde se ha probado.
