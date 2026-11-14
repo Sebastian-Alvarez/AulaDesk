@@ -83,7 +83,7 @@ Alcance confirmado por la [validación de la fase 1](validacion/fase-1.md):
 
 - **RF-03:** `course_sync.py` de AulaVirtualSync sirve de referencia: filtro por semestre, archivos ignorados, nombre de carpeta por ramo y accesos directos para enlaces externos.
 - **RF-06, nota del ramo:** las ponderaciones solo vienen en los ítems ya calificados, así que el usuario debe ingresar las del programa del ramo.
-- **RF-06, asistencia:** la USM no expone funciones `mod_attendance_*`, pero el plugin tiene soporte para la app móvil: `tool_mobile_get_content` entrega el resumen de cada actividad (sesiones, puntos, porcentajes y máximo posible), sin detalle por sesión y dentro de una plantilla HTML que hay que leer. Ver [Asistencia por la vía de la app móvil](validacion/rf-06-asistencia.md) (2026-11-13).
+- **RF-06, asistencia:** depende de la instancia. Si no expone funciones `mod_attendance_*` pero el plugin tiene soporte para la app móvil, `tool_mobile_get_content` entrega el resumen de cada actividad (sesiones, puntos, porcentajes y máximo posible), sin detalle por sesión y dentro de una plantilla HTML que hay que leer. Validado en la USM: [Asistencia por la vía de la app móvil](validacion/rf-06-asistencia.md) (2026-11-13).
 
 ### 3.2 Requisitos no funcionales
 
@@ -421,7 +421,7 @@ Realizada el 2026-11-07. El detalle está en el [informe de validación](validac
 - [x] Funcionamiento del autologin en la USM: funciona, con las restricciones de D-15.
 - [x] Disponibilidad del plugin de asistencia (`mod_attendance_*`): no hay funciones disponibles.
 - [x] Disponibilidad de la exportación iCal de Moodle: activa.
-- [ ] Asistencia mediante `tool_mobile_get_plugins_supporting_mobile` y `tool_mobile_get_content` (pendiente).
+- [x] Asistencia mediante `tool_mobile_get_plugins_supporting_mobile` y `tool_mobile_get_content`: disponible, solo el resumen por actividad (2026-11-13). Ver [informe](validacion/rf-06-asistencia.md).
 
 ---
 
