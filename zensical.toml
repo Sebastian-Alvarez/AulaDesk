@@ -27,6 +27,7 @@ nav = [
   ] },
   { "Validación" = [
     { "Fase 1 (2026-11-07)" = "validacion/fase-1.md" },
+    { "Asistencia, RF-06 (2026-11-13)" = "validacion/rf-06-asistencia.md" },
   ] },
 ]
 
