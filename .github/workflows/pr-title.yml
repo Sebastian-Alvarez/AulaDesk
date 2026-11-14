@@ -1,0 +1,60 @@
+name: PR title
+
+# Con squash merge, el título del PR se convierte en el mensaje del commit en main (D-30), así que
+# se revisa con committed y la misma committed.toml del hook commit-msg: una sola fuente de reglas.
+#   - edited: al corregir el título en GitHub el check se repite solo, sin hacer otro commit.
+#   - synchronize: el check requerido se asocia al último commit del PR; sin esto, cada push lo
+#     dejaría pendiente.
+on:
+  pull_request:
+    types: [opened, edited, synchronize, reopened]
+
+permissions:
+  contents: read
+
+concurrency:
+  group: pr-title-${{ github.event.pull_request.number }}
+  cancel-in-progress: true
+
+jobs:
+  # Corre en cada evento, también si solo se editó la descripción: un job omitido contaría como
+  # aprobado y podría ocultar un título inválido.
+  pr-title:
+    name: pr-title
+    runs-on: ubuntu-24.04
+    timeout-minutes: 5
+    steps:
+      # Solo la configuración; la del PR, para probar cambios a committed.toml en el mismo PR
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          sparse-checkout: committed.toml
+          sparse-checkout-cone-mode: false
+          persist-credentials: false
+
+      - name: Install committed
+        env:
+          GH_TOKEN: ${{ github.token }}
+          # Misma versión que el hook de .pre-commit-config.yaml. Dependabot actualiza el hook,
+          # no este valor: al cambiar la versión, actualizar también el SHA-256 del archivo.
+          COMMITTED_VERSION: "1.1.12"
+          COMMITTED_SHA256: "9a860b0a557bc842df663ce923213ff36f077ae2783f8db3123738823279387f"
+        run: |
+          dir="$RUNNER_TEMP/committed"
+          archive="committed-v${COMMITTED_VERSION}-x86_64-unknown-linux-musl.tar.gz"
+          gh release download "v${COMMITTED_VERSION}" -R crate-ci/committed -p "$archive" -D "$dir"
+          cd "$dir"
+          echo "${COMMITTED_SHA256}  ${archive}" | sha256sum --check
+          tar -xzf "$archive" ./committed
+          echo "$dir" >> "$GITHUB_PATH"
+
+      # El título va por variable de entorno y no interpolado en el script, porque lo escribe
+      # quien abre el PR. Sin --fixup ni --wip (que el hook sí permite): en main no deben
+      # quedar commits "fixup!" ni "WIP".
+      - name: Check title
+        env:
+          PR_TITLE: ${{ github.event.pull_request.title }}
+        run: |
+          if ! printf '%s' "$PR_TITLE" | committed --config committed.toml --commit-file -; then
+            echo "::error title=PR title::El título debe seguir Conventional Commits (ver CONTRIBUTING.md). Corrígelo con 'gh pr edit --title' o en GitHub; el check se repite solo."
+            exit 1
+          fi
