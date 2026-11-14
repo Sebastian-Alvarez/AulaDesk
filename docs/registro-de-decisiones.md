@@ -116,7 +116,7 @@ Alcance confirmado por la [validación de la fase 1](validacion/fase-1.md):
 | D-08 | Tecnología | Rust + Tauri 2 | Decidido |
 | D-09 | Interfaz | React + TypeScript | Decidido |
 | D-10 | Repositorio | Workspace de Cargo y CI con GitHub Actions | Decidido |
-| D-11 | Idioma del repositorio | Código y commits en inglés; documentación en español | Decidido |
+| D-11 | Idioma del repositorio | Código, commits y títulos de PR en inglés; documentación y descripciones de PR en español | Decidido |
 | D-12 | Datos | SQLite, incluyendo la respuesta cruda de Moodle | Decidido |
 | D-13 | Login | Navegador externo, deep link y validación del passport | Decidido |
 | D-14 | Sesión | Token persistente, validado antes de usarse | Decidido |
