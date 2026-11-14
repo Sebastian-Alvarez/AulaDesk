@@ -151,7 +151,7 @@ git push -u origin feat/course-sync
 gh pr create --fill
 ```
 
-- El título del PR debe seguir Conventional Commits, porque se convierte en el mensaje del commit en `main`.
+- El título del PR debe seguir Conventional Commits, porque se convierte en el mensaje del commit en `main`. El check `pr-title` lo revisa con las mismas reglas que el hook; si falla, corrige el título con `gh pr edit --title "..."` o en GitHub, y el check se repite solo.
 - Si el cambio no está terminado, ábrelo como borrador (`gh pr create --draft`) para que la CI corra desde el principio.
 - Subir la rama también sirve para continuar el trabajo desde otro computador. Allá, antes de seguir, trae lo último con `git pull` en la rama.
 - Si ya habías subido la rama antes del `rebase`, súbela con `git push --force-with-lease`.

@@ -346,7 +346,7 @@ Descartados: `bacon` (redundante con RustRover) y `cargo-audit` (cubierto por `c
 
 - Mensajes con Conventional Commits, validados en el hook `commit-msg` con [`committed`](https://github.com/crate-ci/committed) (escrito en Rust; configuración en `committed.toml`). Se descartó `conventional-pre-commit` porque requiere Python.
 - Los cambios llegan a `main` mediante PR, con una regla que exige pasar la CI.
-- Estrategia de ramas: GitHub Flow. `main` es la única rama permanente. Cada cambio se hace en una rama corta creada desde `main`, que se integra con squash merge y se borra al integrarse. El título del PR queda como mensaje del commit en `main`, por lo que también sigue Conventional Commits.
+- Estrategia de ramas: GitHub Flow. `main` es la única rama permanente. Cada cambio se hace en una rama corta creada desde `main`, que se integra con squash merge y se borra al integrarse. El título del PR queda como mensaje del commit en `main`, por lo que también sigue Conventional Commits; el check requerido `pr-title` lo revisa con `committed` y la misma `committed.toml` del hook.
 - Nombres de rama: `tipo/descripcion-corta`, en inglés y en minúsculas con guiones, con los tipos de Conventional Commits (`feat/`, `fix/`, `docs/`, `refactor/`, `test/`, `ci/`, `chore/`). `spike/` se usa para experimentos que pueden descartarse sin integrarse.
 - Versiones: tags SemVer anotados (`vX.Y.Z`) sobre `main`, en `0.x` mientras la API no sea estable. Una rama `release/X.Y` se crea solo si hay que corregir una versión anterior sin incluir lo nuevo de `main`.
 - Descartado: Git Flow (rama `develop` y ramas de release y hotfix permanentes). Sirve para mantener varias versiones publicadas a la vez; con un solo desarrollador agrega pasos sin beneficio.
