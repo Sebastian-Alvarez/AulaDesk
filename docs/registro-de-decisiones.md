@@ -220,7 +220,7 @@ auladesk/
 
 Integración continua con GitHub Actions: compilación y pruebas en Windows y Linux.
 
-**D-11 Idioma del repositorio.** Código, comentarios y commits en inglés, que es el estándar de la industria. Documentación (README, ADR, diagramas) en español.
+**D-11 Idioma del repositorio.** Código, comentarios, commits, nombres de rama y títulos de PR en inglés, que es el estándar de la industria; el título del PR se convierte en el commit de `main` (D-30). Documentación (README, ADR, diagramas) y descripciones de PR en español.
 
 ### 5.4 Datos
 
