@@ -354,7 +354,8 @@ Descartados: `bacon` (redundante con RustRover) y `cargo-audit` (cubierto por `c
 
 - Los minutos de GitHub Actions no tienen costo en repositorios públicos, así que ya no se limita Windows a los PR, como se planeaba mientras el repositorio fuera privado.
 
-- Caché de compilación, cancelación de ejecuciones obsoletas y exclusión de los cambios que solo afectan a `docs/`.
+- Caché de compilación y cancelación de ejecuciones obsoletas.
+- Cada workflow revisa solo lo suyo: Rust corre si el cambio toca archivos de Rust, y la documentación si toca el sitio. Los workflows se activan en todos los PR, sin filtros de rutas, y lo que se salta son los pasos; así los checks requeridos siempre se reportan y no dejan un PR en espera. El escaneo de secretos corre siempre.
 - Las compilaciones completas de la app (instaladores) corren solo en los PR hacia `main` o al crear una versión.
 
 ---

@@ -14,35 +14,67 @@ concurrency:
   cancel-in-progress: ${{ github.event_name == 'pull_request' }}
 
 jobs:
+  # Construye el sitio solo si el cambio afecta a la documentación. El job corre siempre, sin
+  # filtros de rutas en el disparador, para que el check requerido "docs" se reporte en todos
+  # los PR; si no hay cambios de documentación, sus pasos se saltan y el check queda aprobado.
   build:
     name: docs
     runs-on: ubuntu-24.04
     timeout-minutes: 10
+    outputs:
+      docs: ${{ steps.filter.outputs.docs }}
     steps:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
         with:
+          fetch-depth: 2
           persist-credentials: false
 
+      - id: filter
+        name: Detect documentation changes
+        run: |
+          # Archivos que forman el sitio: páginas, modelo C4, herramientas y esta configuración
+          docs_files='^(docs/|arquitectura/|tools/docs/|dev/structurizr/)|^zensical\.toml$|^justfile$|^\.github/workflows/docs\.yml$'
+          if [ "$GITHUB_EVENT_NAME" = "workflow_dispatch" ]; then
+            docs=true
+          # En un PR, HEAD es el merge con main y HEAD^1 es main; en un push a main, el commit anterior
+          elif git diff --name-only HEAD^1 HEAD | grep -qE "$docs_files"; then
+            docs=true
+          else
+            docs=false
+          fi
+          echo "docs=$docs" >> "$GITHUB_OUTPUT"
+
+      - name: Skip (no documentation changes)
+        if: steps.filter.outputs.docs != 'true'
+        run: echo "El cambio no afecta a la documentación; no se construye el sitio."
+
       - uses: taiki-e/install-action@cfdb7ed4ccc7c7dce37759eae89dc5674b469b39 # v2.90.3
+        if: steps.filter.outputs.docs == 'true'
         with:
           tool: just@1.59.0
 
       - uses: astral-sh/setup-uv@68559e99cc807c1eb7e9238fd43a15bba460eec2 # v10.3.3
+        if: steps.filter.outputs.docs == 'true'
         with:
           version: "0.11.32"
 
       - name: Build site
+        if: steps.filter.outputs.docs == 'true'
         run: just docs-build docs-diagrams
 
       - name: Upload site
+        if: steps.filter.outputs.docs == 'true'
         uses: actions/upload-pages-artifact@fc324d3547104276b827a68afc52ff2a11cc49c9 # v5.0.0
         with:
           path: site
 
-  # Publica en GitHub Pages solo desde main y solo si la variable del
-  # repositorio PAGES_ENABLED vale "true" (Settings → Secrets and variables → Actions).
+  # Publica en GitHub Pages solo desde main, solo si se construyó el sitio y solo si la variable
+  # del repositorio PAGES_ENABLED vale "true" (Settings → Secrets and variables → Actions).
+  # Para volver a publicar sin cambios, ejecutar el workflow a mano (workflow_dispatch).
   deploy:
-    if: github.ref == 'refs/heads/main' && github.event_name != 'pull_request' && vars.PAGES_ENABLED == 'true'
+    if: >-
+      github.ref == 'refs/heads/main' && github.event_name != 'pull_request'
+      && vars.PAGES_ENABLED == 'true' && needs.build.outputs.docs == 'true'
     needs: build
     runs-on: ubuntu-24.04
     timeout-minutes: 10
