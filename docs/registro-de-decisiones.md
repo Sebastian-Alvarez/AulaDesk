@@ -2,7 +2,7 @@
 title: AulaDesk - Registro de decisiones
 project: AulaDesk (nombre temporal)
 stage: Análisis y diseño inicial
-updated: 2026-11-12
+updated: 2026-11-14
 ---
 
 # AulaDesk - Registro de decisiones
@@ -12,7 +12,7 @@ AulaDesk es un nombre temporal. El nombre definitivo no puede incluir "Moodle", 
 | Campo | Valor |
 |---|---|
 | Etapa | Análisis y diseño inicial |
-| Última actualización | 2026-11-12 |
+| Última actualización | 2026-11-14 |
 | Estados usados | Decidido, Pospuesto, Pendiente, Propuesto |
 
 ## Contenido
@@ -138,6 +138,7 @@ Alcance confirmado por la [validación de la fase 1](validacion/fase-1.md):
 | D-30 | Flujo de Git | GitHub Flow con ramas cortas, Conventional Commits, PR con regla en `main` y Dependabot | Decidido |
 | D-31 | Moodle de pruebas | Instancia local en Docker, definida en el repositorio | Decidido |
 | D-32 | CI | Linux y Windows en cada push | Decidido |
+| D-33 | Dependencias base | reqwest, tokio, serde, thiserror y anyhow, clap | Decidido |
 
 ---
 
@@ -187,6 +188,23 @@ Alternativas consideradas: arquitectura en capas, Clean/Onion, *vertical slices*
 Alternativa considerada: Go + Wails v3 (estable desde el 2026-10-26). Cubre todos los criterios y es más fácil de aprender, pero Tauri 2 es la opción más probada para estos requisitos.
 
 **D-09 Interfaz.** React + TypeScript.
+
+**D-33 Dependencias base.** Crates sobre las que se construyen el núcleo y la CLI. Sin ADR: son las opciones estándar del ecosistema y se pueden cambiar sin afectar la arquitectura.
+
+| Necesidad | Crate | Dónde | Descartadas |
+|---|---|---|---|
+| Cliente HTTP | `reqwest` 0.13, con `rustls` (su TLS por defecto) y las features `form` y `json` | `auladesk-core` | `ureq` (bloqueante), `hyper` (bajo nivel) |
+| Runtime asíncrono | `tokio` | `auladesk-cli`; en la fase 2, el de Tauri | `async-std` (discontinuado) |
+| Serialización | `serde` y `serde_json` | Ambos | `simd-json` y `sonic-rs` (rendimiento que no hace falta), `miniserde` y `nanoserde` (sin los atributos que necesita Moodle) |
+| Errores de la librería | `thiserror` | `auladesk-core` | `snafu`, `derive_more`, `error-stack` |
+| Errores de la aplicación | `anyhow` | `auladesk-cli` | `color-eyre`, `miette` |
+| Argumentos de la línea de comandos | `clap` con derive | `auladesk-cli` | `argh` (sin autocompletado para PowerShell), `pico-args` (sin ayuda ni validación) |
+
+- Las versiones se declaran una sola vez en `[workspace.dependencies]` y cada crate las hereda.
+- `rustls` usa el mismo TLS en Windows y Linux, con TLS 1.3 en ambos. `tokio` es el runtime de Tauri, así que el núcleo se integra sin adaptadores. `serde` es requisito de `reqwest` y de los comandos de Tauri.
+- El núcleo solo expone funciones `async`; el runtime lo pone quien lo usa.
+- Errores del núcleo: un `enum` por módulo, con un método `kind()` que indica la reacción: reintentar (red, gateway), pedir login (`invalidtoken`, keyring), degradar la función (función no disponible en la instancia) o avisar (disco, almacenamiento). Moodle devuelve sus errores con HTTP 200 (`exception`, `errorcode`), así que el cliente revisa el cuerpo además del código de estado. En la fase 2, los errores implementan `Serialize` para los comandos de Tauri.
+- La ayuda de la CLI se escribe en español; los mensajes de error de `clap` al leer los argumentos quedan en inglés. Es aceptable para una herramienta de desarrollo.
 
 ### 5.3 Repositorio
 
@@ -404,6 +422,7 @@ El identificador de la app (P-12) debe definirse antes de publicar: cambiarlo de
 | Solo conexiones HTTPS hacia Moodle | Propuesto |
 | Indicar al usuario cómo revocar el token (reiniciar la clave de seguridad), porque cerrar sesión no lo invalida | Propuesto |
 | Token de la USM durante el desarrollo: nunca en archivos; solo a través de la CLI (keyring) o de `validate_usm.py`. El HTTP Client usa únicamente el token de prueba del Moodle local (D-31). Si el token se filtra, reiniciar la clave de seguridad. | Decidido |
+| Errores y logs sin el token: los errores de `reqwest` se registran sin URL (`without_url()`), porque las descargas de `pluginfile.php` llevan el token en la URL; un test verifica que ningún error contenga el token de prueba (D-33) | Decidido |
 
 ### 7.3 Marca
 
