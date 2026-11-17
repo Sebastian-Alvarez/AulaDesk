@@ -6,7 +6,7 @@ version = "0.0.0"
 description = "Herramientas de documentación de AulaDesk"
 requires-python = "==3.13.*"
 dependencies = [
-    "zensical==0.1.0",
+    "zensical==0.1.1",
 ]
 
 [tool.uv]
